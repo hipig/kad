@@ -11,4 +11,6 @@ return [
     'administrator_userid' => env('TENCENT_IM_ADMINISTRATOR_USERID'),
 
     'administrator_usersig' => env('TENCENT_IM_ADMINISTRATOR_USERSIG'),
+
+    'token' => env('TENCENT_IM_TOKEN'),
 ];

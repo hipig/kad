@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('username')->unique()->comment('用户名');
             $table->string('avatar')->nullable()->comment('头像');
             $table->string('wallet_account')->unique()->comment('钱包地址');
+            $table->unsignedInteger('friend_count')->default(0)->comment('好友数量');
             $table->unsignedInteger('following_count')->default(0)->comment('关注数量');
             $table->unsignedInteger('follower_count')->default(0)->comment('粉丝数量');
             $table->string('homepage_cover')->nullable()->comment('主页封面');

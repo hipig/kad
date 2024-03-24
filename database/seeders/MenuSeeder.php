@@ -33,8 +33,8 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => '用户举报',
-                        'key' => 'report.user',
-                        'path' => 'report/user',
+                        'key' => 'user.report',
+                        'path' => 'user/report',
                     ],
                 ]
             ],
@@ -74,8 +74,8 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => '动态举报',
-                        'key' => 'report.post',
-                        'path' => 'report/post',
+                        'key' => 'post.report',
+                        'path' => 'post/report',
                     ]
                 ]
             ]

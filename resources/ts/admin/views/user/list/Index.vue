@@ -22,58 +22,51 @@ import { Message } from '@arco-design/web-vue';
 
 const columns = [
     {
-        dataIndex: 'name',
-        title: '用户名称',
+        dataIndex: 'nickname',
+        title: '昵称',
         render: ({record}) => {
             return (
                 <div class="flex items-center space-x-2">
                     <img width="24" src={record.avatar} alt=""/>
-                    <span>{record.name}</span>
+                    <span>{record.nickname}</span>
                 </div>
             )
         }
+    },
+    {
+        dataIndex: 'username',
+        title: '用户名'
     },
     {
         dataIndex: 'wallet_account',
         title: '钱包地址'
     },
     {
-        dataIndex: 'following_count',
-        title: '关注数'
+        dataIndex: 'friend_count',
+        title: '好友数',
+        align: 'center'
     },
     {
         dataIndex: 'following_count',
-        title: '关注数'
+        title: '关注数',
+        align: 'center'
     },
     {
         dataIndex: 'follower_count',
-        title: '粉丝数'
+        title: '粉丝数',
+        align: 'center'
     },
     {
         dataIndex: 'created_at',
         title: '注册时间'
-    },
-    {
-        dataIndex: 'approved_at',
-        title: '审核时间'
     }
 ];
 
 const listDataRef = ref();
 
-const storeVisible = ref(false);
-
-const userId = ref();
-const store = ref();
-
 const renderData = async ({ current }) => {
     return await users({
         page: current
     })
-}
-
-const handleViewStore = (record) => {
-    store.value = record.store;
-    storeVisible.value = true;
 }
 </script>

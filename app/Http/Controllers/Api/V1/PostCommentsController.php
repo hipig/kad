@@ -10,6 +10,8 @@ class PostCommentsController extends Controller
 {
     public function destroy(PostComment $comment)
     {
+        $this->authorize('own', $comment);
+
         $comment->delete();
 
         return response()->noContent();

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('quote_post_id')->nullable()->comment('引用动态');
             $table->text('content')->nullable()->comment('发布内容');
             $table->unsignedTinyInteger('visible_status')->default(1)->comment('可见状态');
+            $table->unsignedInteger('view_count')->default(0)->comment('浏览数量');
             $table->unsignedInteger('collect_count')->default(0)->comment('收藏数量');
             $table->unsignedInteger('like_count')->default(0)->comment('点赞数量');
             $table->unsignedInteger('comment_count')->default(0)->comment('评论数量');

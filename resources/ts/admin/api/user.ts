@@ -7,6 +7,6 @@ export interface UserRecord {
     wallet_account: string;
 }
 
-export function users() {
-    return axios.get<UserRecord[]>('users');
+export function users(params) {
+    return axios.get<UserRecord[]>('users', {params});
 }

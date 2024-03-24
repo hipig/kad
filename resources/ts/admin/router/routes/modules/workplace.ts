@@ -6,9 +6,6 @@ const WORKPLACE: AppRouteRecordRaw = {
     name: 'workplace',
     redirect: '/workplace/dashboard',
     component: DEFAULT_LAYOUT,
-    meta: {
-        title: '仪表盘',
-    },
     children: [
         {
             path: 'dashboard',

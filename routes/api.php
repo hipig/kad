@@ -29,11 +29,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('users/{user}/followers', [V1\UserFollowersController::class, 'followers'])->name('users.followers');
         Route::post('users/{user}/follow', [V1\UserFollowersController::class, 'follow'])->name('users.follow');
         Route::post('users/{user}/un-follow', [V1\UserFollowersController::class, 'unFollow'])->name('users.un-follow');
+        Route::post('users/{user}/report', [V1\UsersController::class, 'report'])->name('users.report');
 
         Route::apiResource('posts', V1\PostsController::class)->only(['index', 'store', 'destroy'])->names('posts');
         Route::post('posts/{post}/comment', [V1\PostsController::class, 'comment'])->name('posts.comment');
         Route::post('posts/{post}/like', [V1\PostsController::class, 'like'])->name('posts.like');
         Route::post('posts/{post}/collect', [V1\PostsController::class, 'collect'])->name('posts.collect');
+        Route::post('posts/{post}/report', [V1\PostsController::class, 'report'])->name('posts.report');
 
         Route::delete('post-comments/{comment}', [V1\PostCommentsController::class, 'destroy'])->name('post-comments.destroy');
 

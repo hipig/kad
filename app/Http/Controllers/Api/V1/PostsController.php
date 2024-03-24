@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Exceptions\InvalidRequestException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\PostRequest;
 use App\Http\Resources\PostCollectResource;
 use App\Http\Resources\PostCommentResource;
 use App\Http\Resources\PostLikeResource;
 use App\Http\Resources\PostResource;
+use App\Http\Resources\ReportResource;
 use App\ModelFilters\Api\PostFilter;
 use App\Models\Post;
 use App\Models\PostCollect;
 use App\Models\PostComment;
 use App\Models\PostLike;
+use App\Models\Report;
 use App\Notifications\PostCollected;
 use App\Notifications\PostCommented;
 use App\Notifications\PostLiked;
@@ -47,9 +50,38 @@ class PostsController extends Controller
 
     public function destroy(Post $post)
     {
+        $this->authorize('own', $post);
+
         $post->delete();
 
+        $post->images()->delete();
+
         return response()->noContent();
+    }
+
+    public function report(Request $request, Post $post)
+    {
+        $this->validate($request, [
+            'type' => 'required'
+        ]);
+
+        $authUser = Auth::user();
+
+        if ($authUser->id === $post->user_id) {
+            throw new InvalidRequestException('不要举报自己的动态哦');
+        }
+
+        $report = new Report(
+            $request->only([
+                'type',
+                'content'
+            ])
+        );
+        $report->user()->associate($authUser);
+        $report->reportable()->associate($post);
+        $report->save();
+
+        return ReportResource::make($report);
     }
 
     public function comment(Request $request, Post $post)
@@ -81,6 +113,8 @@ class PostsController extends Controller
 
     public function unLike(Post $post)
     {
+        $this->authorize('own', $post);
+
         $like = PostLike::query()->where('user_id', Auth::id())->where('post_id', $post->id)->first();
         if ($like) {
             $like->delete();
@@ -106,6 +140,8 @@ class PostsController extends Controller
 
     public function unCollect(Post $post)
     {
+        $this->authorize('own', $post);
+
         $collect = PostCollect::query()->where('user_id', Auth::id())->where('post_id', $post->id)->first();
         if ($collect) {
             $collect->delete();

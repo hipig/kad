@@ -8,7 +8,7 @@ use App\Http\Integrations\TencentIM\TencentIMConnector;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class ImportTencentImAccount
+class ImportTimAccount implements ShouldQueue
 {
     /**
      * Create the event listener.
