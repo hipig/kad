@@ -26,8 +26,6 @@ class ImportTencentImAccount
         $user = $event->getUser();
 
         $connector = new TencentIMConnector();
-        $response = $connector->send(new AccountImportRequest($user->username, $user->nickname, $user->avatar ?? ''));
-
-        dd($response->json());
+        $connector->send(new AccountImportRequest($user->username, $user->nickname, $user->avatar ?? ''));
     }
 }
