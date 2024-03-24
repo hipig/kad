@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Exceptions\InvalidRequestException;
+use App\Exceptions\InternalException;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -25,7 +25,7 @@ class TimAuthenticate
         ]);
 
         if ($validator->fails()) {
-            throw new InvalidRequestException('签名校验失败');
+            throw new InternalException('签名校验失败');
         }
 
         $sign = $request->input('Sign');
@@ -35,13 +35,13 @@ class TimAuthenticate
         $time = Carbon::createFromTimestamp($timestamp);
 
         if (now()->subMinute()->gt($time) && now()->addMinute()->lt($time)) {
-            throw new InvalidRequestException('签名校验失败');
+            throw new InternalException('签名校验失败');
         }
 
         $hashSign = hash('sha256', config('im.token') . $time);
 
         if (strcmp($sign, $hashSign) !== 0) {
-            throw new InvalidRequestException('签名校验失败');
+            throw new InternalException('签名校验失败');
         }
 
         return $next($request);
