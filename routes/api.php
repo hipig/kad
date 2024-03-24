@@ -24,6 +24,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('me', [V1\AuthorizationsController::class, 'me'])->name('authorizations.me');
         Route::get('user_sign', [V1\UsersController::class, 'userSign'])->name('users.user_sign');
 
+        Route::get('users/{user}', [V1\UsersController::class, 'show'])->name('users.show');
         Route::get('users/{user}/following', [V1\UserFollowersController::class, 'following'])->name('users.following');
         Route::get('users/{user}/followers', [V1\UserFollowersController::class, 'followers'])->name('users.followers');
         Route::post('users/{user}/follow', [V1\UserFollowersController::class, 'follow'])->name('users.follow');
@@ -35,5 +36,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('posts/{post}/collect', [V1\PostsController::class, 'collect'])->name('posts.collect');
 
         Route::delete('post-comments/{comment}', [V1\PostCommentsController::class, 'destroy'])->name('post-comments.destroy');
+
+        Route::get('notifications', [V1\NotificationsController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/{notification}/read', [V1\NotificationsController::class, 'read'])->name('notifications.read');
+
+        Route::post('uploads', [V1\UploadsController::class, 'store'])->name('uploads.store');
     });
 });

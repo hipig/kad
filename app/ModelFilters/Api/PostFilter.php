@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ModelFilters;
+namespace App\ModelFilters\Api;
 
 use EloquentFilter\ModelFilter;
 use Illuminate\Support\Facades\Auth;

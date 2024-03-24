@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use App\TencentIM\TLSSigAPIv2;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
+    public function show(Request $request, User $user)
+    {
+        return UserResource::make($user);
+    }
+
     public function userSign(Request $request)
     {
         $user = Auth::user();

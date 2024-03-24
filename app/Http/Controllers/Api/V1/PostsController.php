@@ -8,11 +8,14 @@ use App\Http\Resources\PostCollectResource;
 use App\Http\Resources\PostCommentResource;
 use App\Http\Resources\PostLikeResource;
 use App\Http\Resources\PostResource;
-use App\ModelFilters\PostFilter;
+use App\ModelFilters\Api\PostFilter;
 use App\Models\Post;
 use App\Models\PostCollect;
 use App\Models\PostComment;
 use App\Models\PostLike;
+use App\Notifications\PostCollected;
+use App\Notifications\PostCommented;
+use App\Notifications\PostLiked;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,12 +30,17 @@ class PostsController extends Controller
 
     public function store(PostRequest $request)
     {
-        $post = new Post(
-            $request->only('content', 'visible_status')
-        );
+        $content = $request->input('content');
+        $visibleStatus = $request->input('visible_status', 1);
+        $post = new Post([
+            'content' => $content,
+            'visible_status' => $visibleStatus
+        ]);
         $post->published_at = now();
         $post->user()->associate(Auth::user());
         $post->save();
+
+        $post->images()->sync($request->image_ids);
 
         return PostResource::make($post);
     }
@@ -53,6 +61,8 @@ class PostsController extends Controller
         $comment->post()->associate($post);
         $comment->save();
 
+        $post->user->notify(new PostCommented($comment));
+
         return PostCommentResource::make($comment);
     }
 
@@ -62,6 +72,8 @@ class PostsController extends Controller
         $like->user()->associate(Auth::user());
         $like->post()->associate($post);
         $like->save();
+
+        $post->user->notify(new PostLiked($like));
 
         return PostLikeResource::make($like);
     }
@@ -85,6 +97,8 @@ class PostsController extends Controller
         $collect->user()->associate(Auth::user());
         $collect->post()->associate($post);
         $collect->save();
+
+        $post->user->notify(new PostCollected($collect));
 
         return PostCollectResource::make($collect);
     }

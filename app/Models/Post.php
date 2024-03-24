@@ -21,4 +21,9 @@ class Post extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function images()
+    {
+        return $this->belongsToMany(Upload::class, 'post_has_images', 'post_id', 'upload_id')->withTimestamps();
+    }
 }

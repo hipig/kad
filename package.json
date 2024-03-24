@@ -6,8 +6,24 @@
         "build": "vite build"
     },
     "devDependencies": {
+        "@arco-design/web-vue": "^2.55.0",
         "axios": "^1.6.4",
         "laravel-vite-plugin": "^1.0.0",
+        "unocss": "^0.58.5",
         "vite": "^5.0.0"
+    },
+    "dependencies": {
+        "@unocss/reset": "^0.58.3",
+        "@vitejs/plugin-vue-jsx": "^3.1.0",
+        "@vitejs/plugin-vue": "^5.0.2",
+        "@vueuse/core": "^10.9.0",
+        "dayjs": "^1.11.10",
+        "lodash": "^4.17.21",
+        "mitt": "^3.0.1",
+        "nprogress": "^0.2.0",
+        "pinia": "^2.1.7",
+        "pinia-plugin-persistedstate": "^3.2.1",
+        "vue": "^3.4.6",
+        "vue-router": "^4.2.5"
     }
 }
