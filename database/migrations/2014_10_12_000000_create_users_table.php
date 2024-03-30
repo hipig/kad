@@ -21,6 +21,15 @@ return new class extends Migration
             $table->unsignedInteger('following_count')->default(0)->comment('关注数量');
             $table->unsignedInteger('follower_count')->default(0)->comment('粉丝数量');
             $table->string('homepage_cover')->nullable()->comment('主页封面');
+            $table->string('gender', 64)->default('Unknown')->comment('性别');
+            $table->string('birthday', 64)->nullable()->comment('生日');
+            $table->string('self_signature')->nullable()->comment('个性签名');
+            $table->string('allow_type', 64)->default('AllowAny')->comment('加好友验证方式');
+            $table->unsignedInteger('language')->nullable()->comment('语言');
+            $table->string('admin_forbid_type', 64)->default('none')->comment('管理员禁止加好友标识');
+            $table->string('level')->nullable()->comment('等级');
+            $table->string('role')->nullable()->comment('角色');
+            $table->json('defined_data')->nullable()->comment('自定义字段');
             $table->unsignedTinyInteger('status')->default(1)->comment('状态');
             $table->rememberToken();
             $table->timestamps();

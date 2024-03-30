@@ -15,6 +15,8 @@ return new class extends Migration
             $table->comment('腾讯云即时通信事件');
             $table->id();
             $table->string('type', 64)->comment('类型');
+            $table->string('platform', 64)->nullable()->comment('平台');
+            $table->string('client_ip')->nullable()->comment('客户端IP');
             $table->json('data')->nullable()->comment('事件数据');
             $table->timestamp('executed_at')->nullable()->comment('执行时间');
             $table->timestamps();

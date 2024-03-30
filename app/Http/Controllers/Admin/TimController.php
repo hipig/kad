@@ -18,6 +18,8 @@ class TimController extends Controller
 
         $event = TimEvent::create([
             'type' => $request->CallbackCommand,
+            'platform' => $request->OptPlatform,
+            'client_ip' => $request->ClientIP,
             'data' => $request->post()
         ]);
 
