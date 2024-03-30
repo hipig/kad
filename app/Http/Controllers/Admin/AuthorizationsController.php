@@ -40,7 +40,7 @@ class AuthorizationsController extends Controller
     protected function respondWithToken($token)
     {
         $model = $token->token;
-        $model->expires_at = Carbon::now()->addDays(2);
+        $model->expires_at = Carbon::now()->addDays(7);
         $model->save();
 
         return response()->json([

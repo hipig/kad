@@ -34,7 +34,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::apiResource('posts', V1\PostsController::class)->only(['index', 'store', 'destroy'])->names('posts');
         Route::post('posts/{post}/comment', [V1\PostsController::class, 'comment'])->name('posts.comment');
         Route::post('posts/{post}/like', [V1\PostsController::class, 'like'])->name('posts.like');
+        Route::post('posts/{post}/un-like', [V1\PostsController::class, 'unLike'])->name('posts.un-like');
         Route::post('posts/{post}/collect', [V1\PostsController::class, 'collect'])->name('posts.collect');
+        Route::post('posts/{post}/un-collect', [V1\PostsController::class, 'unCollect'])->name('posts.un-collect');
         Route::post('posts/{post}/report', [V1\PostsController::class, 'report'])->name('posts.report');
 
         Route::delete('post-comments/{comment}', [V1\PostCommentsController::class, 'destroy'])->name('post-comments.destroy');
