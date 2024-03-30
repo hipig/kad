@@ -115,9 +115,8 @@ class PostsController extends Controller
     {
         $like = PostLike::query()->where('user_id', Auth::id())->where('post_id', $post->id)->first();
 
-        $this->authorize('own', $like);
-
         if ($like) {
+            $this->authorize('own', $like);
             $like->delete();
         }
 
@@ -143,9 +142,8 @@ class PostsController extends Controller
     {
         $collect = PostCollect::query()->where('user_id', Auth::id())->where('post_id', $post->id)->first();
 
-        $this->authorize('own', $collect);
-
         if ($collect) {
+            $this->authorize('own', $collect);
             $collect->delete();
         }
 
