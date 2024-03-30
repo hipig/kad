@@ -34,7 +34,7 @@ class PostsController extends Controller
     public function store(PostRequest $request)
     {
         $content = $request->input('content');
-        $visibleStatus = $request->input('visible_status', 1);
+        $visibleStatus = $request->input('visible_status') ?? Post::VISIBLE_STATUS_COMMON;
         $post = new Post([
             'content' => $content,
             'visible_status' => $visibleStatus
