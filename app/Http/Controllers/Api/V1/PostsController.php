@@ -113,9 +113,10 @@ class PostsController extends Controller
 
     public function unLike(Post $post)
     {
-        $this->authorize('own', $post);
-
         $like = PostLike::query()->where('user_id', Auth::id())->where('post_id', $post->id)->first();
+
+        $this->authorize('own', $like);
+
         if ($like) {
             $like->delete();
         }
@@ -140,9 +141,10 @@ class PostsController extends Controller
 
     public function unCollect(Post $post)
     {
-        $this->authorize('own', $post);
-
         $collect = PostCollect::query()->where('user_id', Auth::id())->where('post_id', $post->id)->first();
+
+        $this->authorize('own', $collect);
+
         if ($collect) {
             $collect->delete();
         }
