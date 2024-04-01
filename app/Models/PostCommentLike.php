@@ -3,12 +3,8 @@
 namespace App\Models;
 
 
-class PostComment extends Model
+class PostCommentLike extends Model
 {
-    protected $fillable = [
-        'content'
-    ];
-
     public function comment()
     {
         return $this->belongsTo(PostComment::class, 'comment_id');

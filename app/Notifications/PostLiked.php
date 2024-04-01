@@ -41,4 +41,9 @@ class PostLiked extends Notification implements ShouldQueue
             'post' => $this->like->post->toArray()
         ];
     }
+
+    public function shouldSend(object $notifiable, string $channel): bool
+    {
+        return $notifiable->id !== $this->like->user_id;
+    }
 }

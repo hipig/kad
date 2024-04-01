@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('post_comments', function (Blueprint $table) {
-            $table->comment('动态评论');
+        Schema::create('post_comment_likes', function (Blueprint $table) {
+            $table->comment('评论点赞');
             $table->id();
-            $table->unsignedBigInteger('comment_id')->nullable()->comment('上级评论ID');
+            $table->unsignedBigInteger('comment_id')->comment('评论ID');
             $table->unsignedBigInteger('post_id')->comment('动态ID');
             $table->unsignedBigInteger('user_id')->comment('用户ID');
-            $table->text('content')->nullable()->comment('内容');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('post_comments');
+        Schema::dropIfExists('comment_likes');
     }
 };

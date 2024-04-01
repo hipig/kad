@@ -15,14 +15,15 @@ return new class extends Migration
             $table->comment('动态');
             $table->id();
             $table->unsignedBigInteger('user_id')->comment('用户ID');
-            $table->unsignedBigInteger('quote_post_id')->nullable()->comment('引用动态');
+            $table->unsignedBigInteger('repost_post_id')->nullable()->comment('转发动态ID');
             $table->text('content')->nullable()->comment('发布内容');
             $table->unsignedTinyInteger('visible_status')->default(1)->comment('可见状态');
             $table->unsignedInteger('view_count')->default(0)->comment('浏览数量');
             $table->unsignedInteger('collect_count')->default(0)->comment('收藏数量');
             $table->unsignedInteger('like_count')->default(0)->comment('点赞数量');
             $table->unsignedInteger('comment_count')->default(0)->comment('评论数量');
-            $table->unsignedInteger('share_count')->default(0)->comment('分享数量');
+            $table->unsignedInteger('repost_count')->default(0)->comment('转发数量');
+            $table->timestamp('top_at')->nullable()->comment('置顶时间');
             $table->timestamp('published_at')->nullable()->comment('发布时间');
             $table->timestamps();
         });

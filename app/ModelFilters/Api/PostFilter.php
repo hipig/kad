@@ -2,6 +2,7 @@
 
 namespace App\ModelFilters\Api;
 
+use App\Models\UserFollower;
 use EloquentFilter\ModelFilter;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,7 +24,7 @@ class PostFilter extends ModelFilter
             case 'recommend':
                 return $query;
             case 'following':
-                $followingIds = $user->following()->pluck('id');
+                $followingIds = UserFollower::query()->where('follower_id', $user->id)->pluck('user_id');
                 return $query->whereIn('user_id', $followingIds);
             case 'like':
                 $likeIds = $user->postLikes()->pluck('post_id');

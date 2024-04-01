@@ -36,6 +36,9 @@ class UserFollowersController extends Controller
             $follower->user()->associate($user);
             $follower->follower()->associate($authUser);
             $follower->save();
+
+            $user->increment('follower_count');
+            $authUser->increment('following_count');
         }
 
         return UserFollowerResource::make($follower);
@@ -47,6 +50,9 @@ class UserFollowersController extends Controller
         $follower = UserFollower::query()->where('user_id', $user->id)->where('follower_id', $authUser->id)->first();
         if ($follower) {
             $follower->delete();
+
+            $user->decrement('follower_count');
+            $authUser->decrement('following_count');
         }
 
         return response()->noContent();

@@ -2,13 +2,13 @@
 
 namespace App\Notifications;
 
-use App\Models\PostCollect;
+use App\Models\PostComment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PostCollected extends Notification implements ShouldQueue
+class PostCommentCommented extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -16,7 +16,7 @@ class PostCollected extends Notification implements ShouldQueue
      * Create a new notification instance.
      */
     public function __construct(
-        protected PostCollect $collect
+        protected PostComment $comment
     ) {}
 
     /**
@@ -37,13 +37,15 @@ class PostCollected extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'user' => $this->collect->user->toArray(),
-            'post' => $this->collect->post->toArray()
+            'content' => $this->comment->content,
+            'user' => $this->comment->user->toArray(),
+            'comment' => $this->comment->comment->toArray(),
+            'post' => $this->comment->post->toArray()
         ];
     }
 
     public function shouldSend(object $notifiable, string $channel): bool
     {
-        return $notifiable->id !== $this->collect->user_id;
+        return $notifiable->id !== $this->comment->user_id;
     }
 }

@@ -3,17 +3,8 @@
 namespace App\Models;
 
 
-class PostComment extends Model
+class PostBlock extends Model
 {
-    protected $fillable = [
-        'content'
-    ];
-
-    public function comment()
-    {
-        return $this->belongsTo(PostComment::class, 'comment_id');
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

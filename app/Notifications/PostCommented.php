@@ -42,4 +42,9 @@ class PostCommented extends Notification implements ShouldQueue
             'post' => $this->comment->post->toArray()
         ];
     }
+
+    public function shouldSend(object $notifiable, string $channel): bool
+    {
+        return $notifiable->id !== $this->comment->user_id;
+    }
 }
