@@ -2,6 +2,8 @@
 
 namespace App\ModelFilters\Api;
 
+use App\Models\Post;
+use App\Models\PostComment;
 use App\Models\UserFollower;
 use EloquentFilter\ModelFilter;
 use Illuminate\Support\Facades\Auth;
@@ -22,16 +24,26 @@ class PostFilter extends ModelFilter
         $query = $this->whereNotNull('published_at');
         switch ($type) {
             case 'recommend':
-                return $query;
+                break;
             case 'following':
                 $followingIds = UserFollower::query()->where('follower_id', $user->id)->pluck('user_id');
-                return $query->whereIn('user_id', $followingIds);
+                $query->whereIn('user_id', $followingIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                break;
             case 'like':
-                $likeIds = $user->postLikes()->pluck('post_id');
-                return $query->whereIn('id', $likeIds);
+                $likePostIds = $user->postLikes()->pluck('post_id');
+                $query->whereIn('id', $likePostIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                break;
             case 'collect':
-                $collectIds = $user->postCollects()->pluck('post_id');
-                return $query->whereIn('id', $collectIds);
+                $collectPostIds = $user->postCollects()->pluck('post_id');
+                $query->whereIn('id', $collectPostIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                break;
+            case 'comment':
+                $commentPostIds = PostComment::query()->where('user_id', $user->id)->pluck('post_id');
+                $query->whereIn('id', $commentPostIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                break;
+            case 'myself':
+                $query->where('user_id', $user->id)->latest('top_at');
+                break;
         }
 
         return $query->latest('published_at');
