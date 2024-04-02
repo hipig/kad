@@ -11,6 +11,8 @@ Route::post('authorizations', [Admin\AuthorizationsController::class, 'store'])-
 // 当前菜单
 Route::get('menus/current', [Admin\MenusController::class, 'current'])->name('menus.current');
 
+Route::post('uploads', [Admin\UploadsController::class, 'store'])->name('uploads.store');
+
 Route::middleware('auth:admin_api')->group(function () {
 
     Route::get('me', [Admin\AuthorizationsController::class, 'me'])->name('authorizations.me');

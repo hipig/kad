@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
@@ -62,7 +63,9 @@ class User extends Authenticatable
     {
         parent::boot();
         static::creating(function ($model) {
-            $model->nickname = '新用户' . Str::random(8);
+            if (!$model->nickname) {
+                $model->nickname = '新用户' . Str::random(8);
+            }
             if (!$model->username) {
                 $model->username = static::findAvailableUsername();
                 if (!$model->username) {
@@ -102,18 +105,19 @@ class User extends Authenticatable
         return $this->belongsToMany(Post::class, 'post_collects', 'user_id', 'post_id');
     }
 
-
-
-    protected function userSig() :Attribute
+    protected function avatar(): Attribute
     {
-        return Attribute::get(function () {
-            $cacheKey = "user_sig:{$this->id}";
-            $ttl = 86400 * 7;
-            return Cache::remember($cacheKey, $ttl, function () use ($ttl) {
-                return app(TLSSigAPIv2::class)->genUserSig($this->username, $ttl);
-            });
-        });
+        return Attribute::make(
+            function ($value) {
+                if (empty($value) || Str::startsWith($value, ['http://', 'https://'])) {
+                    return $value;
+                }
+
+                return Storage::disk('upload')->url($value);
+            }
+        );
     }
+
 
     public static function findAvailableUsername()
     {

@@ -21,7 +21,7 @@ class PostFilter extends ModelFilter
     public function type($type)
     {
         $user = Auth::user();
-        $query = $this->whereNotNull('published_at');
+        $query = $this;
         switch ($type) {
             case 'recommend':
                 break;
@@ -46,6 +46,6 @@ class PostFilter extends ModelFilter
                 break;
         }
 
-        return $query->latest('published_at');
+        return $query;
     }
 }

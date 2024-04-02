@@ -10,3 +10,7 @@ export interface UserRecord {
 export function users(params) {
     return axios.get<UserRecord[]>('users', {params});
 }
+
+export function storeUsers(data) {
+    return axios.post<UserRecord>('users', data);
+}

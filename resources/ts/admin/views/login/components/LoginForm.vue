@@ -26,6 +26,7 @@
             hide-label
         >
             <a-input
+                type="password"
                 v-model="loginForm.password"
                 placeholder="密码"
             >

@@ -30,7 +30,7 @@ class PostsController extends Controller
 {
     public function index(Request $request)
     {
-        $posts = Post::filter($request->all(), PostFilter::class)->with(['user', 'images', 'comments', 'comments.user', 'repostPost', 'repostUsers'])->paginate($request->page_size ?? 15);
+        $posts = Post::filter($request->all(), PostFilter::class)->with(['user', 'images', 'comments', 'comments.user', 'repostPost', 'repostUsers'])->whereNotNull('published_at')->latest('published_at')->latest()->paginate($request->page_size ?? 15);
         $authId = Auth::id();
 
 
@@ -56,7 +56,8 @@ class PostsController extends Controller
             $post->user()->associate(Auth::user());
             $post->save();
 
-            $post->images()->sync($request->image_ids);
+            $imageIds = is_array($request->image_ids) ? $request->image_ids : explode(',', $request->image_ids);
+            $post->images()->sync($imageIds);
             $post->save();
 
             if ($post->repostPost) {
