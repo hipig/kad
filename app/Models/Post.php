@@ -70,7 +70,7 @@ class Post extends Model
 
     public function selfCollect()
     {
-        return $this->hasOne(PostComment::class, 'post_id')->ofMany([
+        return $this->hasOne(PostCollect::class, 'post_id')->ofMany([
             'id' => 'max',
         ], function (Builder $query) {
             $query->where('user_id', Auth::id());
