@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Exceptions\InvalidRequestException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserFollowerResource;
 use App\Http\Resources\UserResource;
@@ -16,6 +17,11 @@ class UserFollowersController extends Controller
     {
         $following = $user->following()->paginate($request->page_size ?? 15);
 
+        $follows = UserFollower::query()->where('user_id', $user->id)->whereIn('follower_id', $following->getCollection()->pluck('id'))->get();
+        foreach ($following->getCollection() as $item) {
+            $item->is_followed = !!$follows->where('follower_id', $item->id)->first();
+        }
+
         return UserResource::collection($following);
     }
 
@@ -23,12 +29,22 @@ class UserFollowersController extends Controller
     {
         $followers = $user->followers()->paginate($request->page_size ?? 15);
 
+        $follows = UserFollower::query()->where('follower_id', $user->id)->whereIn('user_id', $followers->getCollection()->pluck('id'))->get();
+        foreach ($followers->getCollection() as $item) {
+            $item->is_followed = !!$follows->where('user_id', $item->id)->first();
+        }
+
         return UserResource::collection($followers);
     }
 
     public function follow(Request $request, User $user)
     {
         $authUser = Auth::user();
+
+        if ($authUser->id === $user->id) {
+            throw new InvalidRequestException('不能关注自己哦。');
+        }
+
         $follower = UserFollower::query()->where('user_id', $user->id)->where('follower_id', $authUser->id)->first();
 
         if (!$follower) {

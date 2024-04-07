@@ -45,9 +45,14 @@ class MenuSeeder extends Seeder
                 'icon' => 'icon-message',
                 'children' => [
                     [
-                        'name' => '聊天记录',
+                        'name' => '单聊记录',
                         'key' => 'chat-message.index',
                         'path' => 'chat-message/index',
+                    ],
+                    [
+                        'name' => '群聊记录',
+                        'key' => 'chat-group.message',
+                        'path' => 'chat-group/message',
                     ],
                     [
                         'name' => '群组列表',

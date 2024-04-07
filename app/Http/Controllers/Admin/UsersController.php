@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\UserCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
 use App\Http\Resources\UserResource;
@@ -25,6 +26,8 @@ class UsersController extends Controller
                 'nickname', 'avatar', 'wallet_account'
             ])
         );
+
+        event(new UserCreated($user));
 
         return UserResource::make($user);
     }

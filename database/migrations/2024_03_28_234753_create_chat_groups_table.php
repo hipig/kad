@@ -15,14 +15,14 @@ return new class extends Migration
             $table->comment('聊天群组');
             $table->id();
             $table->unsignedBigInteger('owner_id')->nullable()->comment('群主用户ID');
-            $table->string('group_id')->comment('群组ID');
+            $table->string('group_key')->nullable()->comment('群组ID');
             $table->string('name')->comment('名称');
             $table->string('type', 64)->default('public')->comment('类型');
             $table->string('avatar')->nullable()->comment('头像');
             $table->string('introduction')->nullable()->comment('简介');
             $table->string('notification')->nullable()->comment('通知');
-            $table->timestamp('last_info_time')->nullable()->comment('最后群资料变更时间');
-            $table->timestamp('last_msg_time')->nullable()->comment('群内最后一条消息的时间');
+            $table->timestamp('last_info_at')->nullable()->comment('最后群资料变更时间');
+            $table->timestamp('last_msg_at')->nullable()->comment('群内最后一条消息的时间');
             $table->unsignedInteger('member_num')->default(0)->comment('当前群成员数量');
             $table->unsignedInteger('max_member_num')->default(0)->comment('最大群成员数量');
             $table->string('apply_join_option', 64)->default('FreeAccess')->comment('申请加群处理方式');

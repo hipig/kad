@@ -2,7 +2,9 @@
     <div class="space-y-4">
         <div class="flex items-center">
             <div class="flex-auto">
-                <slot name="actions" :selection-row-keys="selectionRowKeys"></slot>
+                <a-space>
+                    <slot name="actions" :selection-row-keys="selectionRowKeys"></slot>
+                </a-space>
             </div>
             <div class="flex-none">
                 <a-space>
@@ -98,9 +100,11 @@ const _columns = computed(() => {
         {
             dataIndex: 'action',
             title: '操作',
+            fixed: 'right',
+            width: 200,
             render: row => {
                 return (
-                    <ASpace>
+                    <ASpace size="small">
                         {slots.action(row)}
                     </ASpace>
                 )

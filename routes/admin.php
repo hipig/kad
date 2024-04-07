@@ -26,4 +26,10 @@ Route::middleware('auth:admin_api')->group(function () {
     Route::apiResource('posts', Admin\PostsController::class)->names('posts');
 
     Route::apiResource('post-comments', Admin\PostCommentsController::class)->names('post-comments');
+
+    Route::apiResource('chat-groups', Admin\ChatGroupsController::class)->names('chat-groups')->parameters([
+        'chat-groups' => 'group'
+    ]);
+    Route::post('chat-groups/dissolve', [Admin\ChatGroupsController::class, 'dissolve'])->name('chat-groups.dissolve');
+    Route::get('chat-group-users', [Admin\ChatGroupUsersController::class, 'index'])->name('chat-group-users.index');
 });

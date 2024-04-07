@@ -30,13 +30,7 @@ class PostsController extends Controller
 {
     public function index(Request $request)
     {
-        $posts = Post::filter($request->all(), PostFilter::class)->with(['user', 'images', 'comments', 'comments.user', 'repostPost', 'repostUsers'])->whereNotNull('published_at')->latest('published_at')->latest()->paginate($request->page_size ?? 15);
-        $authId = Auth::id();
-
-
-        foreach ($posts->getCollection() as $post) {
-            $post->is_self = $authId === $post->user_id;
-        }
+        $posts = Post::filter($request->all(), PostFilter::class)->with(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers'])->whereNotNull('published_at')->latest('published_at')->latest()->paginate($request->page_size ?? 15);
 
         return PostResource::collection($posts);
     }
@@ -57,7 +51,7 @@ class PostsController extends Controller
             $post->save();
 
             $imageIds = is_array($request->image_ids) ? $request->image_ids : explode(',', $request->image_ids);
-            $post->images()->sync($imageIds);
+            $post->images()->sync(array_filter($imageIds));
             $post->save();
 
             if ($post->repostPost) {
@@ -77,7 +71,7 @@ class PostsController extends Controller
 
     public function show(Post $post)
     {
-        $post->load(['user', 'images', 'comments', 'comments.user', 'repostPost', 'repostUsers']);
+        $post->load(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers']);
         return PostResource::make($post);
     }
 

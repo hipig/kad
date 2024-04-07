@@ -21,7 +21,7 @@ class AccountImportRequest extends BaseRequest
         return [
             'UserID' => $this->userId,
             'Nick' => $this->nickname,
-            'provider' => $this->avatar,
+            'FaceUrl' => $this->avatar,
         ];
     }
 

@@ -6,9 +6,11 @@ namespace App\Models;
 use App\TencentIM\TLSSigAPIv2;
 use DateTimeInterface;
 use EloquentFilter\Filterable;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -36,7 +38,15 @@ class User extends Authenticatable
         'nickname',
         'avatar',
         'wallet_account',
-        'homepage_cover'
+        'homepage_cover',
+        'gender',
+        'location',
+        'birthday',
+        'self_signature',
+        'allow_type',
+        'language',
+        'level',
+        'status'
     ];
 
     /**
@@ -57,6 +67,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'defined_data' => 'json'
     ];
 
     protected static function boot()
@@ -105,6 +116,22 @@ class User extends Authenticatable
         return $this->belongsToMany(Post::class, 'post_collects', 'user_id', 'post_id');
     }
 
+    protected function isFollower(): Attribute
+    {
+        return Attribute::get(function () {
+            $follower = UserFollower::query()->where('follower_id', Auth::id())->where('user_id', $this->id)->first();
+            return !is_null($follower);
+        });
+    }
+
+    protected function isFollowing(): Attribute
+    {
+        return Attribute::get(function () {
+            $following = UserFollower::query()->where('follower_id', $this->id)->where('user_id', Auth::id())->first();
+            return !is_null($following);
+        });
+    }
+
     protected function avatar(): Attribute
     {
         return Attribute::make(
@@ -117,7 +144,6 @@ class User extends Authenticatable
             }
         );
     }
-
 
     public static function findAvailableUsername()
     {
