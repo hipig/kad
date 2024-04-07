@@ -19,6 +19,7 @@ use App\Models\PostComment;
 use App\Models\PostLike;
 use App\Models\PostRepost;
 use App\Models\Report;
+use App\Models\UserFollower;
 use App\Notifications\PostCollected;
 use App\Notifications\PostCommented;
 use App\Notifications\PostLiked;
@@ -31,6 +32,11 @@ class PostsController extends Controller
     public function index(Request $request)
     {
         $posts = Post::filter($request->all(), PostFilter::class)->with(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers'])->whereNotNull('published_at')->latest('published_at')->latest()->paginate($request->page_size ?? 15);
+
+        $follows = UserFollower::query()->where('follower_id', Auth::id())->whereIn('user_id', $posts->getCollection()->pluck('user_id'))->get();
+        foreach ($posts->getCollection() as $item) {
+            $item->is_followed = !!$follows->where('user_id', $item->user_id)->first();
+        }
 
         return PostResource::collection($posts);
     }
@@ -72,6 +78,10 @@ class PostsController extends Controller
     public function show(Post $post)
     {
         $post->load(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers']);
+
+        $follow = UserFollower::query()->where('follower_id', Auth::id())->where('user_id', $post->user_id)->first();
+        $post->is_followed = !!$follow;
+
         return PostResource::make($post);
     }
 
