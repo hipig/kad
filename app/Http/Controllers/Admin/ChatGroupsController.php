@@ -33,6 +33,7 @@ class ChatGroupsController extends Controller
 
             if ($group->owner) {
                 $group->increment('member_num');
+                $group->owner->increment('chat_group_count');
 
                 $groupUser = new ChatGroupUser();
                 $groupUser->user()->associate($group->owner);

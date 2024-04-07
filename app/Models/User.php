@@ -28,6 +28,20 @@ class User extends Authenticatable
         self::STATUS_DISABLE => '禁用'
     ];
 
+    public static $associatedFieldMap = [
+        'nickname' => 'Tag_Profile_IM_Nick',
+        'avatar' => 'Tag_Profile_IM_Image',
+        'gender' => 'Tag_Profile_IM_Gender',
+        'birthday' => 'Tag_Profile_IM_BirthDay',
+        'location' => 'Tag_Profile_IM_Location',
+        'self_signature' => 'Tag_Profile_IM_SelfSignature',
+        'allow_type' => 'Tag_Profile_IM_AllowType',
+        'language' => 'Tag_Profile_IM_Language',
+        'admin_forbid_type' => 'Tag_Profile_IM_AdminForbidType',
+        'level' => 'Tag_Profile_IM_Level',
+        'role' => 'Tag_Profile_IM_Role'
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -46,6 +60,8 @@ class User extends Authenticatable
         'allow_type',
         'language',
         'level',
+        'role',
+        'admin_forbid_type',
         'status'
     ];
 

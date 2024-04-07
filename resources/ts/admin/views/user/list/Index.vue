@@ -44,9 +44,9 @@
                 </AFormItem>
                 <AFormItem field="gender" label="性别">
                     <ASelect v-model="updateForm.gender" placeholder="请选择性别">
-                        <AOption value="Unknown">未设置性别</AOption>
-                        <AOption value="Female">男</AOption>
-                        <AOption value="Male">女</AOption>
+                        <AOption value="Gender_Type_Unknown">未设置性别</AOption>
+                        <AOption value="Gender_Type_Female">男</AOption>
+                        <AOption value="Gender_Type_Male">女</AOption>
                     </ASelect>
                 </AFormItem>
                 <AFormItem field="location" label="所在地">
@@ -60,9 +60,9 @@
                 </AFormItem>
                 <AFormItem field="allow_type" label="加好友验证方式">
                     <ASelect v-model="updateForm.allow_type" placeholder="请选择状态">
-                        <AOption value="NeedConfirm">需要经过自己确认对方才能添加自己为好友</AOption>
-                        <AOption value="AllowAny">允许任何人添加自己为好友</AOption>
-                        <AOption value="DenyAny">不允许任何人添加自己为好友</AOption>
+                        <AOption value="AllowType_Type_NeedConfirm">需要经过自己确认对方才能添加自己为好友</AOption>
+                        <AOption value="AllowType_Type_AllowAny">允许任何人添加自己为好友</AOption>
+                        <AOption value="AllowType_Type_DenyAny">不允许任何人添加自己为好友</AOption>
                     </ASelect>
                 </AFormItem>
                 <AFormItem field="language" label="语言">
@@ -73,8 +73,8 @@
                 </AFormItem>
                 <AFormItem field="admin_forbid_type" label="管理员禁止加好友标识">
                     <ASelect v-model="updateForm.admin_forbid_type" placeholder="请选择状态">
-                        <AOption value="None">需要经过自己确认对方才能添加自己为好友</AOption>
-                        <AOption value="SendOut">禁止该用户发起加好友请求</AOption>
+                        <AOption value="AdminForbid_Type_None">需要经过自己确认对方才能添加自己为好友</AOption>
+                        <AOption value="AdminForbid_Type_SendOut">禁止该用户发起加好友请求</AOption>
                     </ASelect>
                 </AFormItem>
                 <AFormItem field="status" label="状态">
