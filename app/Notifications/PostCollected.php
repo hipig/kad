@@ -42,6 +42,12 @@ class PostCollected extends Notification implements ShouldQueue
         ];
     }
 
+    public function databaseType()
+    {
+        return 'PostCollected';
+    }
+
+
     public function shouldSend(object $notifiable, string $channel): bool
     {
         return $notifiable->id !== $this->collect->user_id;

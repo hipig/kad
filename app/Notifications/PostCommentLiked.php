@@ -43,6 +43,11 @@ class PostCommentLiked extends Notification implements ShouldQueue
         ];
     }
 
+    public function databaseType()
+    {
+        return 'PostCommentLiked';
+    }
+
     public function shouldSend(object $notifiable, string $channel): bool
     {
         return $notifiable->id !== $this->like->user_id;
