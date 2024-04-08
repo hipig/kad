@@ -29,7 +29,7 @@
             </AForm>
         </AModal>
         <AModal :width="640" v-model:visible="updateVisible" title="编辑用户" @before-ok="handleUpdateUser">
-            <AForm ref="updateFormRef" :model="createForm" layout="vertical">
+            <AForm ref="updateFormRef" :model="updateForm" layout="vertical">
                 <AFormItem field="username" label="用户名">
                     <AInput v-model="updateForm.username" placeholder="请输入用户名" readonly/>
                 </AFormItem>
@@ -53,7 +53,7 @@
                     <AInput v-model="updateForm.location" placeholder="请输入所在地" />
                 </AFormItem>
                 <AFormItem field="birthday" label="生日">
-                    <ADatePicker style="width: 100%" v-model="updateForm.birthday" format="YYYYMMDD" @clear="updateForm.birthday === ''" />
+                    <AInputNumber v-model="updateForm.birthday" placeholder="格式为：20200101" />
                 </AFormItem>
                 <AFormItem field="self_signature" label="个性签名">
                     <AInput v-model="updateForm.self_signature" placeholder="请输入个性签名" />
@@ -70,6 +70,9 @@
                 </AFormItem>
                 <AFormItem field="level" label="等级">
                     <AInput v-model="updateForm.level" placeholder="请输入等级" />
+                </AFormItem>
+                <AFormItem field="role" label="角色">
+                    <AInput v-model="updateForm.role" placeholder="请输入角色" />
                 </AFormItem>
                 <AFormItem field="admin_forbid_type" label="管理员禁止加好友标识">
                     <ASelect v-model="updateForm.admin_forbid_type" placeholder="请选择状态">
@@ -89,7 +92,7 @@
 </template>
 
 <script lang="tsx" setup>
-import {users, storeUsers} from "@admin/api/user";
+import {users, storeUsers, updateUsers} from "@admin/api/user";
 import {ref} from "vue";
 import { Message } from '@arco-design/web-vue';
 import {cloneDeep} from "lodash";
@@ -177,8 +180,9 @@ const updateForm = ref({
     birthday: '',
     self_signature: '',
     allow_type: '',
-    language: '',
-    level: '',
+    language: 0,
+    level: 0,
+    role: 0,
     admin_forbid_type: '',
     status: ''
 })
@@ -222,6 +226,26 @@ const handleUpdate = async (record) => {
         }];
     }
     updateVisible.value = true;
+}
+
+const handleUpdateUser = async (done) => {
+    try {
+        const validate = await updateFormRef.value.validate();
+
+        if (validate) {
+            throw new Error(validate[Object.keys(validate)[0]].message || '请填写完整表单');
+        }
+
+        await updateUsers(updateForm.value.id, updateForm.value);
+        done(true);
+        Message.success('操作成功');
+        updateFormRef.value.resetFields();
+        updateFileList.value = [];
+        listDataRef.value.refreshData();
+    } catch (e) {
+        Message.error(e.message);
+        done(false);
+    }
 }
 
 const handleFileUpload = (file) => {

@@ -14,3 +14,7 @@ export function users(params) {
 export function storeUsers(data) {
     return axios.post<UserRecord>('users', data);
 }
+
+export function updateUsers(userId, data) {
+    return axios.put<UserRecord>('users/' + userId, data);
+}

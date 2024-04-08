@@ -31,6 +31,7 @@ class User extends Authenticatable
     public static $associatedFieldMap = [
         'nickname' => 'Tag_Profile_IM_Nick',
         'avatar' => 'Tag_Profile_IM_Image',
+        'wallet_account' => 'Tag_Profile_Custom_Wallet',
         'gender' => 'Tag_Profile_IM_Gender',
         'birthday' => 'Tag_Profile_IM_BirthDay',
         'location' => 'Tag_Profile_IM_Location',

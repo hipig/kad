@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Events\UserCreated;
+use App\Events\UserUpdated;
 use App\Exceptions\InvalidRequestException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
@@ -29,6 +30,8 @@ class AuthorizationsController extends Controller
 
             event(new UserCreated($user));
         }
+
+        event(new UserUpdated($user));
 
         if ($user->status != User::STATUS_ENABLE) {
             throw new InvalidRequestException('用户已禁用');

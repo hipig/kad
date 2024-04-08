@@ -14,7 +14,17 @@ class NotificationsController extends Controller
     {
         $user = Auth::user();
 
-        $notifications = $user->notifications()->latest('read_at')->paginate($request->page_size ?? 15);
+        $query = $user->notifications();
+
+        if ($type = $request->input('type')) {
+            $query->where('type', $type);
+        }
+
+        if ($request->boolean('unread')) {
+            $query->whereNull('read_at');
+        }
+
+        $notifications = $query->latest('read_at')->paginate($request->page_size ?? 15);
 
         return NotificationResource::collection($notifications);
     }

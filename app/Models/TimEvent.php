@@ -23,6 +23,9 @@ class TimEvent extends Model
     const TYPE_MESSAGE_SENT = 'C2C.CallbackAfterSendMsg'; // 单聊消息发送后
     const TYPE_MESSAGE_WITHDRAW = 'C2C.CallbackAfterMsgWithDraw'; // 单聊消息撤回后
 
+    const PLATFORM_RESTAPI = 'RESTAPI';
+    const PLATFORM_ANDROID = 'Android';
+
 
     protected $fillable = [
         'type',

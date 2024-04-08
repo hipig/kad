@@ -5,10 +5,11 @@ namespace App\Http\Integrations\TencentIM;
 use Saloon\Http\Connector;
 use Saloon\Http\Response;
 use Saloon\Traits\Plugins\AcceptsJson;
+use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
 
 class TencentIMConnector extends Connector
 {
-    use AcceptsJson;
+    use AcceptsJson, AlwaysThrowOnErrors;
 
     /**
      * The Base URL of the API

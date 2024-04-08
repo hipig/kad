@@ -3,6 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\TimEventCreated;
+use App\Models\ChatGroup;
+use App\Models\ChatGroupUser;
 use App\Models\TimEvent;
 use App\Models\User;
 use App\Models\UserFriend;
@@ -28,8 +30,14 @@ class ExecuteTimEvent
         $timEvent = $event->getEvent();
         $data = $timEvent->data;
 
+        if ($timEvent->platform === TimEvent::PLATFORM_RESTAPI) {
+            return;
+        }
+
         $methodMap = [
             TimEvent::TYPE_PROFILE_SET => 'setProfile',
+            TimEvent::TYPE_GROUP_CREATED => 'createGroup',
+            TimEvent::TYPE_GROUP_DESTROYED => 'destroyGroup',
             TimEvent::TYPE_FRIEND_ADD => 'addFriend',
             TimEvent::TYPE_FRIEND_DELETE => 'deleteFriend',
         ];
@@ -57,6 +65,40 @@ class ExecuteTimEvent
         }
         $fromUser->forceFill($updateData);
         $fromUser->save();
+    }
+
+    public function createGroup($data)
+    {
+        DB::transaction(function () use ($data) {
+
+            $group = ChatGroup::create([
+                'name' => $data['Name'],
+                'type' => $data['Type']
+            ]);
+
+            if ($data['Owner_Account']) {
+                $owner = User::query()->where('username', $data['Owner_Account'])->first();
+                $group->increment('member_num');
+                $group->owner()->associate($owner);
+                $group->group_key = $data['GroupId'];
+                $group->save();
+
+                $groupUser = new ChatGroupUser();
+                $groupUser->user()->associate($owner);
+                $groupUser->role = ChatGroupUser::ROLE_OWNER;
+                $groupUser->join_at = now();
+                $groupUser->save();
+            }
+        });
+    }
+
+    public function destroyGroup($data)
+    {
+        $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
+        if ($group) {
+            $group->status = ChatGroup::STATUS_DISSOLVE;
+            $group->save();
+        }
     }
 
     protected function addFriend($data)

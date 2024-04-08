@@ -25,13 +25,13 @@ return new class extends Migration
             $table->string('homepage_cover')->nullable()->comment('主页封面');
             $table->string('gender', 64)->default('Gender_Type_Unknown')->comment('性别');
             $table->string('location')->nullable()->comment('所在地');
-            $table->string('birthday')->nullable()->comment('生日');
+            $table->unsignedInteger('birthday')->default(0)->comment('生日');
             $table->string('self_signature')->nullable()->comment('个性签名');
             $table->string('allow_type', 64)->default('AllowType_Type_AllowAny')->comment('加好友验证方式');
-            $table->unsignedInteger('language')->nullable()->comment('语言');
+            $table->unsignedInteger('language')->default(0)->comment('语言');
             $table->string('admin_forbid_type', 64)->default('AdminForbid_Type_None')->comment('管理员禁止加好友标识');
-            $table->string('level')->nullable()->comment('等级');
-            $table->string('role')->nullable()->comment('角色');
+            $table->unsignedInteger('level')->default(0)->comment('等级');
+            $table->unsignedInteger('role')->default(0)->comment('角色');
             $table->json('defined_data')->nullable()->comment('自定义字段');
             $table->unsignedTinyInteger('status')->default(1)->comment('状态');
             $table->rememberToken();
