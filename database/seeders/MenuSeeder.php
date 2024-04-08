@@ -50,7 +50,7 @@ class MenuSeeder extends Seeder
                         'path' => 'chat-message/index',
                     ],
                     [
-                        'name' => '群聊记录',
+                        'name' => '群组消息',
                         'key' => 'chat-group.message',
                         'path' => 'chat-group/message',
                     ],
@@ -94,7 +94,7 @@ class MenuSeeder extends Seeder
 
     public function createMenu($menuData, $parent = null)
     {
-        $menu = Menu::create(collect($menuData)->except(['children'])->toArray());
+        $menu = Menu::updateOrCreate(['key' => $menuData['key']], collect($menuData)->except(['children'])->toArray());
         if (!is_null($parent)) {
             $menu->parent()->associate($parent);
         }

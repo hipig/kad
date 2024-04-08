@@ -6,19 +6,21 @@
                 ref="listDataRef"
                 :render-data="renderData"
                 :columns="columns"
+                :selection-disabled-method="getDisabledSelection"
             >
                 <template #actions="{selectionRowKeys}">
                     <AButton @click="createVisible = true" type="primary">添加群组</AButton>
+                    <AButton :disabled="selectionRowKeys.length === 0" @click="handleSend(selectionRowKeys)" type="primary">发送消息</AButton>
                     <AButton :disabled="selectionRowKeys.length === 0" @click="handleDissolve(selectionRowKeys)" type="primary" status="danger">解散群组</AButton>
                 </template>
                 <template #action="{record}">
                     <AButton type="text" size="small" @click="handleViewUser(record.id)">查看群成员</AButton>
-                    <AButton :disabled="record.status === 2" type="text" size="small">发送消息</AButton>
+                    <AButton :disabled="record.status === 2" @click="handleSend([record.id])" type="text" size="small">发送消息</AButton>
                     <AButton :disabled="record.status === 2" @click="handleDissolve([record.id])" type="text" size="small">解散</AButton>
                 </template>
             </ListData>
         </Panel>
-        <AModal :width="640" v-model:visible="createVisible" title="添加群组" @before-ok="handleBeforeOk">
+        <AModal :width="640" v-model:visible="createVisible" title="添加群组" @before-ok="handleCreateGroup">
             <AForm ref="createFormRef" :model="createForm" layout="vertical">
                 <AFormItem field="name" label="群名称" :rules="[{required: true, message: '群名称不能为空'}]">
                     <AInput v-model="createForm.name" placeholder="请输入群名称" allow-clear/>
@@ -33,11 +35,19 @@
                 </AFormItem>
             </AForm>
         </AModal>
+        <AModal :width="640" v-model:visible="sendVisible" title="发送消息" @before-ok="handleSendMessage">
+            <p>发消息给共 {{ currentGroupIds.length }} 个群组？</p>
+            <AForm ref="sendFormRef" :model="sendForm" layout="vertical">
+                <AFormItem field="text" label="消息内容" :rules="[{required: true, message: '消息内容不能为空'}]">
+                    <ATextarea v-model="sendForm.text" placeholder="请输入" allow-clear/>
+                </AFormItem>
+            </AForm>
+        </AModal>
     </div>
 </template>
 
 <script lang="tsx" setup>
-import {chatGroups, storeChatGroups, dissolveChatGroups} from "@admin/api/chat-group";
+import {chatGroups, storeChatGroups, dissolveChatGroups, sendChatGroupMessages} from "@admin/api/chat-group";
 import {ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
@@ -100,7 +110,11 @@ const listDataRef = ref();
 
 const createVisible = ref(false);
 
+const sendVisible = ref(false);
+
 const createFormRef = ref();
+
+const sendFormRef = ref();
 
 const createForm = ref({
     name: '',
@@ -108,7 +122,11 @@ const createForm = ref({
     owner_id: ''
 })
 
-const fileList = ref([]);
+const sendForm = ref({
+    text: ''
+})
+
+const currentGroupIds = ref([]);
 
 const renderData = async ({ current }) => {
     return await chatGroups({
@@ -139,7 +157,12 @@ const handleDissolve = (groupIds) => {
     });
 }
 
-const handleBeforeOk = async (done) => {
+const handleSend = (groupIds) => {
+    currentGroupIds.value = groupIds;
+    sendVisible.value = true;
+}
+
+const handleCreateGroup = async (done) => {
     try {
         const validate = await createFormRef.value.validate();
         console.log(createFormRef.value)
@@ -158,5 +181,31 @@ const handleBeforeOk = async (done) => {
         Message.error(e.message);
         done(false);
     }
+}
+
+const handleSendMessage = async (done) => {
+    try {
+        const validate = await sendFormRef.value.validate();
+
+        if (validate) {
+            throw new Error(validate[Object.keys(validate)[0]].message || '请填写完整表单');
+        }
+
+        await sendChatGroupMessages({
+            group_ids: currentGroupIds.value,
+            text: sendForm.value.text
+        });
+        done(true);
+        Message.success('操作成功');
+        sendFormRef.value.resetFields();
+        listDataRef.value.refreshData();
+    } catch (e) {
+        Message.error(e.message);
+        done(false);
+    }
+}
+
+const getDisabledSelection = (record) => {
+    return record.status === 2;
 }
 </script>

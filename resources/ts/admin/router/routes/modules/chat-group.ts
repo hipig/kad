@@ -22,6 +22,14 @@ const CHAT_GROUP: AppRouteRecordRaw = {
             meta: {
                 title: '群组成员',
             },
+        },
+        {
+            path: 'message',
+            name: 'chat-group.message',
+            component: () => import('@admin/views/chat-group/message/Index.vue'),
+            meta: {
+                title: '群组消息',
+            },
         }
     ],
 };

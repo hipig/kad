@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Events\UserCreated;
 use App\Http\Integrations\TencentIM\Requests\OpenLogin\AccountImportRequest;
-use App\Http\Integrations\TencentIM\Requests\Profile\PortraitSetRequest;
 use App\Http\Integrations\TencentIM\TencentIMConnector;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -45,8 +45,8 @@
                 <AFormItem field="gender" label="性别">
                     <ASelect v-model="updateForm.gender" placeholder="请选择性别">
                         <AOption value="Gender_Type_Unknown">未设置性别</AOption>
-                        <AOption value="Gender_Type_Female">男</AOption>
-                        <AOption value="Gender_Type_Male">女</AOption>
+                        <AOption value="Gender_Type_Female">女</AOption>
+                        <AOption value="Gender_Type_Male">男</AOption>
                     </ASelect>
                 </AFormItem>
                 <AFormItem field="location" label="所在地">

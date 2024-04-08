@@ -29,7 +29,7 @@ return [
     | `/app/Http/Integrations` directory. If you're using
     | a different design approach, then your classes
     | may be in a different place. You can change
-    | that location so that the saloon:list
+    | that location so that the saloon:message
     | command will still find your files
     |
     */

@@ -2,9 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\ChatGroupCreated;
 use App\Events\ChatGroupDissolved;
-use App\Http\Integrations\TencentIM\Requests\Group\GroupCreateRequest;
 use App\Http\Integrations\TencentIM\Requests\Group\GroupDestroyRequest;
 use App\Http\Integrations\TencentIM\TencentIMConnector;
 use Illuminate\Contracts\Queue\ShouldQueue;

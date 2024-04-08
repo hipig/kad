@@ -20,7 +20,7 @@
         <a-table
             :bordered="false"
             :row-key="rowKey"
-            :data="dataList"
+            :data="computedDataList"
             :columns="_columns"
             :loading="loading"
             :row-selection="_rowSelection"
@@ -58,6 +58,11 @@ const props = defineProps({
     rowKey: {
         type: String,
         default: 'id'
+    },
+    selectionDisabledMethod: Function,
+    actionWidth: {
+        type: Number,
+        default: 200
     }
 });
 
@@ -67,6 +72,16 @@ const slots = defineSlots();
 const { loading, setLoading } = useLoading(true);
 
 const dataList = ref([]);
+
+const computedDataList = computed(() => {
+    return dataList.value.map(item => {
+        const disabled = props.selectionDisabledMethod && props.selectionDisabledMethod(item);
+        return {
+            disabled,
+            ...item
+        }
+    })
+})
 
 const _rowSelection = ref({
     type: 'checkbox',
@@ -101,12 +116,12 @@ const _columns = computed(() => {
             dataIndex: 'action',
             title: '操作',
             fixed: 'right',
-            width: 200,
+            width: props.actionWidth,
             render: row => {
                 return (
-                    <ASpace size="small">
+                    <div class="flex flex-wrap space-x-2">
                         {slots.action(row)}
-                    </ASpace>
+                    </div>
                 )
             }
         }

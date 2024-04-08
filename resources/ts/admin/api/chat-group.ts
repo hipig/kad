@@ -12,8 +12,16 @@ export interface ChatGroupUserRecord {
     owner: object;
 }
 
+export interface ChatGroupMessageRecord {
+    body: object;
+}
+
 export function chatGroups(params) {
     return axios.get<ChatGroupRecord[]>('chat-groups', {params});
+}
+
+export function chatGroupMessages(params) {
+    return axios.get<ChatGroupMessageRecord[]>('chat-group-messages', {params});
 }
 
 export function storeChatGroups(data) {
@@ -26,4 +34,12 @@ export function dissolveChatGroups(data) {
 
 export function chatGroupUsers(params) {
     return axios.get<ChatGroupUserRecord>('chat-group-users', {params});
+}
+
+export function sendChatGroupMessages(data) {
+    return axios.post<ChatGroupMessageRecord[]>('chat-group-messages/send', data);
+}
+
+export function recallChatGroupMessages(data) {
+    return axios.post<ChatGroupMessageRecord[]>('chat-group-messages/recall', data);
 }

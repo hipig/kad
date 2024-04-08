@@ -43,6 +43,8 @@ class User extends Authenticatable
         'role' => 'Tag_Profile_IM_Role'
     ];
 
+    const USERNAME_ADMINISTRATOR = 'administrator';
+
     /**
      * The attributes that are mass assignable.
      *

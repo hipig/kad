@@ -32,4 +32,15 @@ Route::middleware('auth:admin_api')->group(function () {
     ]);
     Route::post('chat-groups/dissolve', [Admin\ChatGroupsController::class, 'dissolve'])->name('chat-groups.dissolve');
     Route::get('chat-group-users', [Admin\ChatGroupUsersController::class, 'index'])->name('chat-group-users.index');
+
+    Route::post('chat-group-messages/send', [Admin\ChatGroupMessagesController::class, 'send'])->name('chat-group-messages.send');
+    Route::post('chat-group-messages/recall', [Admin\ChatGroupMessagesController::class, 'recall'])->name('chat-group-messages.recall');
+    Route::apiResource('chat-group-messages', Admin\ChatGroupMessagesController::class)->names('chat-group-messages')->parameters([
+        'chat-group-messages' => 'message'
+    ]);
+
+    Route::post('chat-messages/withdraw', [Admin\ChatMessagesController::class, 'withdraw'])->name('chat-messages.withdraw');
+    Route::apiResource('chat-messages', Admin\ChatMessagesController::class)->only(['index', 'store'])->names('chat-messages')->parameters([
+        'chat-messages' => 'message'
+    ]);
 });
