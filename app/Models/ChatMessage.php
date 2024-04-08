@@ -8,7 +8,11 @@ class ChatMessage extends Model
     const STATUS_WITHDRAW= 2;
 
     protected $fillable = [
-        'body'
+        'body',
+        'random',
+        'msg_seq',
+        'msg_key',
+        'online_only_flag'
     ];
 
     protected $casts = [

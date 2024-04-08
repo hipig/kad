@@ -10,7 +10,10 @@ class ChatGroupMessage extends Model
     const STATUS_RECALL= 2;
 
     protected $fillable = [
-        'body'
+        'body',
+        'random',
+        'msg_seq',
+        'online_only_flag'
     ];
 
     protected $casts = [

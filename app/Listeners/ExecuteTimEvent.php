@@ -4,10 +4,13 @@ namespace App\Listeners;
 
 use App\Events\TimEventCreated;
 use App\Models\ChatGroup;
+use App\Models\ChatGroupMessage;
 use App\Models\ChatGroupUser;
+use App\Models\ChatMessage;
 use App\Models\TimEvent;
 use App\Models\User;
 use App\Models\UserFriend;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +41,10 @@ class ExecuteTimEvent
             TimEvent::TYPE_PROFILE_SET => 'setProfile',
             TimEvent::TYPE_GROUP_CREATED => 'createGroup',
             TimEvent::TYPE_GROUP_DESTROYED => 'destroyGroup',
+            TimEvent::TYPE_GROUP_MESSAGE_SENT => 'sendGroupMessage',
+            TimEvent::TYPE_GROUP_MESSAGE_RECALL => 'recallGroupMessage',
+            TimEvent::TYPE_MESSAGE_SENT => 'sendMessage',
+            TimEvent::TYPE_MESSAGE_WITHDRAW => 'withdrawMessage',
             TimEvent::TYPE_FRIEND_ADD => 'addFriend',
             TimEvent::TYPE_FRIEND_DELETE => 'deleteFriend',
         ];
@@ -99,6 +106,56 @@ class ExecuteTimEvent
             $group->status = ChatGroup::STATUS_DISSOLVE;
             $group->save();
         }
+    }
+
+    public function sendGroupMessage($data)
+    {
+        $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
+        $user = User::query()->where('username', $data['From_Account'])->first();
+        $message = new ChatGroupMessage([
+            'body' => $data['MsgBody'],
+            'random' => $data['Random'],
+            'msg_seq' => $data['MsgSeq'],
+            'online_only_flag' => $data['OnlineOnlyFlag']
+        ]);
+        $message->group()->associate($group);
+        $message->user()->associate($user);
+        $message->sent_at = Carbon::createFromTimestamp($data['MsgTime']);
+        $message->save();
+    }
+
+    public function recallGroupMessage($data)
+    {
+        $seqList = array_column($data['MsgSeqList'], 'MsgSeq');
+        ChatGroupMessage::query()->whereIn('msg_seq', $seqList)->update([
+            'status' => ChatGroupMessage::STATUS_RECALL
+        ]);
+    }
+
+    public function sendMessage($data)
+    {
+        $user = User::query()->where('username', $data['From_Account'])->first();
+        $toUser = User::query()->where('username', $data['to_Account'])->first();
+        $message = new ChatMessage([
+            'body' => $data['MsgBody'],
+            'random' => $data['Random'],
+            'msg_seq' => $data['MsgSeq'],
+            'msg_key' => $data['MsgKey'],
+            'online_only_flag' => $data['OnlineOnlyFlag']
+        ]);
+        $message->user()->associate($user);
+        $message->toUser()->associate($toUser);
+        $message->sent_at = Carbon::createFromTimestamp($data['MsgTime']);
+        $message->save();
+    }
+
+    public function withdrawMessage($data)
+    {
+        $user = User::query()->where('username', $data['From_Account'])->first();
+        $toUser = User::query()->where('username', $data['to_Account'])->first();
+        ChatMessage::query()->where('user_id', $user->id)->where('to_user_id', $toUser->id)->where('msg_key', $data['MsgKey'])->update([
+            'status' => ChatMessage::STATUS_WITHDRAW
+        ]);
     }
 
     protected function addFriend($data)
