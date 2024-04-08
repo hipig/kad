@@ -17,6 +17,9 @@ class ChatGroupUser extends Model
         self::TYPE_MEMBER => '成员',
     ];
 
+    const STATUS_NORMAL = 1;
+    const STATUS_EXIT = 2;
+
     protected $fillable = [
         'user_id',
     ];

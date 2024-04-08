@@ -41,6 +41,8 @@ class ExecuteTimEvent
             TimEvent::TYPE_PROFILE_SET => 'setProfile',
             TimEvent::TYPE_GROUP_CREATED => 'createGroup',
             TimEvent::TYPE_GROUP_DESTROYED => 'destroyGroup',
+            TimEvent::TYPE_GROUP_USER_JOINED => 'joinGroup',
+            TimEvent::TYPE_GROUP_USER_EXITED => 'exitGroup',
             TimEvent::TYPE_GROUP_MESSAGE_SENT => 'sendGroupMessage',
             TimEvent::TYPE_GROUP_MESSAGE_RECALL => 'recallGroupMessage',
             TimEvent::TYPE_MESSAGE_SENT => 'sendMessage',
@@ -77,7 +79,6 @@ class ExecuteTimEvent
     public function createGroup($data)
     {
         DB::transaction(function () use ($data) {
-
             $group = ChatGroup::create([
                 'name' => $data['Name'],
                 'type' => $data['Type']
@@ -106,6 +107,29 @@ class ExecuteTimEvent
             $group->status = ChatGroup::STATUS_DISSOLVE;
             $group->save();
         }
+    }
+
+    public function joinGroup($data)
+    {
+        $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
+        $usernameList = array_column($data['NewMemberList'], 'Member_Account');
+        $users = User::query()->whereIn('username', $usernameList)->get();
+        foreach ($users as $user) {
+            $groupUser = new ChatGroupUser();
+            $groupUser->group()->associate($group);
+            $groupUser->user()->associate($user);
+            $groupUser->save();
+        }
+    }
+
+    public function exitGroup($data)
+    {
+        $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
+        $usernameList = array_column($data['ExitMemberList'], 'Member_Account');
+        $userIds = User::query()->whereIn('username', $usernameList)->pluck('id');
+        ChatGroupUser::query()->whereIn('group_id', $group->id)->whereIn('user_id', $userIds)->update([
+            'status' => ChatGroupUser::STATUS_EXIT
+        ]);
     }
 
     public function sendGroupMessage($data)
