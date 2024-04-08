@@ -11,7 +11,7 @@ use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class SetTimPortrait
+class SetTimPortrait implements ShouldQueue
 {
     public $afterCommit = true;
 

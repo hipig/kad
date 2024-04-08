@@ -10,7 +10,7 @@ use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class ImportTimAccount
+class ImportTimAccount implements ShouldQueue
 {
     public $afterCommit = true;
 
