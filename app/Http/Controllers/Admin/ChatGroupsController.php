@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Events\ChatGroupCreated;
 use App\Events\ChatGroupDissolved;
+use App\Events\ChatGroupJoined;
 use App\Events\ChatGroupMessageSent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChatGroupRequest;
@@ -39,6 +40,7 @@ class ChatGroupsController extends Controller
                 $group->owner->increment('chat_group_count');
 
                 $groupUser = new ChatGroupUser();
+                $groupUser->group()->associate($group);
                 $groupUser->user()->associate($group->owner);
                 $groupUser->role = ChatGroupUser::ROLE_OWNER;
                 $groupUser->join_at = now();
@@ -64,5 +66,32 @@ class ChatGroupsController extends Controller
         }
 
         return ChatGroupResource::collection($groups);
+    }
+
+    public function join(Request $request, ChatGroup $group)
+    {
+        $group = DB::transaction(function () use ($request, $group) {
+            $silence = $request->silence ?? 0;
+            $userIds = $request->user_ids;
+            $users = User::query()->whereIn('id', $userIds)->get();
+
+            foreach ($users as $user) {
+                $group->increment('member_num');
+                $user->increment('chat_group_count');
+
+                $groupUser = new ChatGroupUser();
+                $groupUser->group()->associate($group);
+                $groupUser->user()->associate($user);
+                $groupUser->role = ChatGroupUser::TYPE_MEMBER;
+                $groupUser->join_at = now();
+                $groupUser->save();
+            }
+            $usernameList = $users->pluck('username')->toArray();
+            event(new ChatGroupJoined($group, $usernameList, $silence));
+
+            return $group;
+        });
+
+        return ChatGroupResource::make($group);
     }
 }

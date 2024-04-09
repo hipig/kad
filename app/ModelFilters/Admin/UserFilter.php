@@ -15,4 +15,8 @@ class UserFilter extends ModelFilter
     */
     public $relations = [];
 
+    public function keyword($keyword)
+    {
+        return $this->where('nickname', 'like', "%{$keyword}%")->orWhere('wallet_account', $keyword);
+    }
 }

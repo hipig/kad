@@ -22,6 +22,7 @@ Route::middleware('auth:admin_api')->group(function () {
     Route::apiResource('users', Admin\UsersController::class)->only(['index', 'store', 'update'])->names('users');
 
     Route::get('reports', [Admin\ReportsController::class, 'index'])->name('reports.index');
+    Route::post('reports/handle', [Admin\ReportsController::class, 'handle'])->name('reports.handle');
 
     Route::apiResource('posts', Admin\PostsController::class)->names('posts');
 
@@ -31,6 +32,7 @@ Route::middleware('auth:admin_api')->group(function () {
         'chat-groups' => 'group'
     ]);
     Route::post('chat-groups/dissolve', [Admin\ChatGroupsController::class, 'dissolve'])->name('chat-groups.dissolve');
+    Route::post('chat-groups/{group}/join', [Admin\ChatGroupsController::class, 'join'])->name('chat-groups.join');
     Route::get('chat-group-users', [Admin\ChatGroupUsersController::class, 'index'])->name('chat-group-users.index');
 
     Route::post('chat-group-messages/send', [Admin\ChatGroupMessagesController::class, 'send'])->name('chat-group-messages.send');

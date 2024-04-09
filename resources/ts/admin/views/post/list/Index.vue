@@ -24,8 +24,8 @@ const columns = [
         render: ({record}) => {
             return (
                 <div class="flex items-center space-x-2">
-                    <img width="24" src={record.user.avatar} alt=""/>
-                    <span>{record.user.nickname}</span>
+                    <img width="24" src={record.user?.avatar} alt=""/>
+                    <span>{record.user?.nickname}</span>
                 </div>
             )
         }

@@ -8,3 +8,7 @@ export interface ReportRecord {
 export function reports(params) {
     return axios.get<ReportRecord[]>('reports', {params});
 }
+
+export function handleReports(data) {
+    return axios.post<ReportRecord[]>('reports/handle', data);
+}

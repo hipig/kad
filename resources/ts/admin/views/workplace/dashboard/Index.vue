@@ -1,3 +1,3 @@
 <template>
-    <div>11111</div>
+    <div>暂无数据</div>
 </template>

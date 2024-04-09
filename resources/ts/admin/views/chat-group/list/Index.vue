@@ -165,7 +165,6 @@ const handleSend = (groupIds) => {
 const handleCreateGroup = async (done) => {
     try {
         const validate = await createFormRef.value.validate();
-        console.log(createFormRef.value)
 
         if (validate) {
             throw new Error(validate[Object.keys(validate)[0]].message || '请填写完整表单');
@@ -175,7 +174,6 @@ const handleCreateGroup = async (done) => {
         done(true);
         Message.success('操作成功');
         createFormRef.value.resetFields();
-        fileList.value = [];
         listDataRef.value.refreshData();
     } catch (e) {
         Message.error(e.message);

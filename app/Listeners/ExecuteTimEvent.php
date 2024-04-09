@@ -111,25 +111,37 @@ class ExecuteTimEvent
 
     public function joinGroup($data)
     {
-        $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
-        $usernameList = array_column($data['NewMemberList'], 'Member_Account');
-        $users = User::query()->whereIn('username', $usernameList)->get();
-        foreach ($users as $user) {
-            $groupUser = new ChatGroupUser();
-            $groupUser->group()->associate($group);
-            $groupUser->user()->associate($user);
-            $groupUser->save();
-        }
+        DB::transaction(function () use ($data) {
+            $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
+            $usernameList = array_column($data['NewMemberList'], 'Member_Account');
+            $users = User::query()->whereIn('username', $usernameList)->get();
+            foreach ($users as $user) {
+                $groupUser = new ChatGroupUser();
+                $groupUser->group()->associate($group);
+                $groupUser->user()->associate($user);
+                $groupUser->role = ChatGroupUser::TYPE_MEMBER;
+                $groupUser->join_at = now();
+                $groupUser->save();
+            }
+
+            $group->increment('member_num');
+            $user->increment('chat_group_count');
+        });
     }
 
     public function exitGroup($data)
     {
-        $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
-        $usernameList = array_column($data['ExitMemberList'], 'Member_Account');
-        $userIds = User::query()->whereIn('username', $usernameList)->pluck('id');
-        ChatGroupUser::query()->whereIn('group_id', $group->id)->whereIn('user_id', $userIds)->update([
-            'status' => ChatGroupUser::STATUS_EXIT
-        ]);
+        DB::transaction(function () use ($data) {
+            $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
+            $usernameList = array_column($data['ExitMemberList'], 'Member_Account');
+            $users = User::query()->whereIn('username', $usernameList)->get();
+            ChatGroupUser::query()->whereIn('group_id', $group->id)->whereIn('user_id', $users->pluck('id'))->update([
+                'status' => ChatGroupUser::STATUS_EXIT
+            ]);
+
+            $group->decrement('member_num');
+            User::query()->whereIn('username', $usernameList)->decrement('chat_group_count');
+        });
     }
 
     public function sendGroupMessage($data)
