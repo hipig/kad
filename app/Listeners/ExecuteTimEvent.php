@@ -10,6 +10,7 @@ use App\Models\ChatMessage;
 use App\Models\TimEvent;
 use App\Models\User;
 use App\Models\UserFriend;
+use App\Models\UserOnlineRecord;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -51,6 +52,7 @@ class ExecuteTimEvent implements ShouldQueue
             TimEvent::TYPE_MESSAGE_WITHDRAW => 'withdrawMessage',
             TimEvent::TYPE_FRIEND_ADD => 'addFriend',
             TimEvent::TYPE_FRIEND_DELETE => 'deleteFriend',
+            TimEvent::TYPE_STATE_CHANGE => 'stateChange'
         ];
 
         $method = $methodMap[$timEvent->type] ?? '';
@@ -259,5 +261,23 @@ class ExecuteTimEvent implements ShouldQueue
             }
         });
 
+    }
+
+    protected function stateChange($data)
+    {
+        $toUser = User::query()->where('username', $data['To_Account'])->first();
+        if ($toUser) {
+            DB::transaction(function () use ($toUser, $data) {
+                $toUser->online_status = $data['Action'];
+                $toUser->save();
+
+                $record = new UserOnlineRecord([
+                    'action' => $data['Action'],
+                    'reason' => $data['Reason']
+                ]);
+                $record->user()->associate($toUser);
+                $record->save();
+            });
+        }
     }
 }

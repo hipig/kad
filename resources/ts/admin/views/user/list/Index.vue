@@ -99,6 +99,10 @@ import {cloneDeep} from "lodash";
 
 const columns = [
     {
+        dataIndex: 'online_status_text',
+        title: '在线状态'
+    },
+    {
         dataIndex: 'nickname',
         title: '昵称',
         render: ({record}) => {

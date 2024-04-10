@@ -34,6 +34,7 @@ return new class extends Migration
             $table->unsignedInteger('role')->default(0)->comment('角色');
             $table->json('defined_data')->nullable()->comment('自定义字段');
             $table->unsignedTinyInteger('status')->default(1)->comment('状态');
+            $table->string('online_status', 64)->nullable()->comment('在线状态');
             $table->rememberToken();
             $table->timestamps();
         });

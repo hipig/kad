@@ -28,6 +28,16 @@ class User extends Authenticatable
         self::STATUS_DISABLE => '禁用'
     ];
 
+    const ONLINE_STATUS_LOGIN = 'Login';
+    const ONLINE_STATUS_LOGOUT = 'Logout';
+    const ONLINE_STATUS_DISCONNECT = 'Disconnect';
+
+    public static $onlineStatusMap  = [
+        self::ONLINE_STATUS_LOGIN => '上线',
+        self::ONLINE_STATUS_LOGOUT => '下线',
+        self::ONLINE_STATUS_DISCONNECT => '连接断开'
+    ];
+
     public static $associatedFieldMap = [
         'nickname' => 'Tag_Profile_IM_Nick',
         'avatar' => 'Tag_Profile_IM_Image',
@@ -87,6 +97,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'defined_data' => 'json'
+    ];
+
+    protected $appends = [
+        'online_status_text'
     ];
 
     protected static function boot()
@@ -162,6 +176,13 @@ class User extends Authenticatable
                 return Storage::disk('upload')->url($value);
             }
         );
+    }
+
+    protected function onlineStatusText(): Attribute
+    {
+        return Attribute::get(function () {
+            return self::$onlineStatusMap[$this->online_status] ?? '未知';
+        });
     }
 
     public static function findAvailableUsername()
