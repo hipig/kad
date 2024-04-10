@@ -15,7 +15,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 
-class ExecuteTimEvent
+class ExecuteTimEvent implements ShouldQueue
 {
     /**
      * Create the event listener.
@@ -33,7 +33,8 @@ class ExecuteTimEvent
         $timEvent = $event->getEvent();
         $data = $timEvent->data;
 
-        if ($timEvent->platform === TimEvent::PLATFORM_RESTAPI) {
+
+        if ($timEvent->platform === TimEvent::PLATFORM_RESTAPI || ($timEvent->type === TimEvent::TYPE_PROFILE_SET && $data['Operator_Account'] === User::USERNAME_ADMINISTRATOR)) {
             return;
         }
 
@@ -79,7 +80,9 @@ class ExecuteTimEvent
     public function createGroup($data)
     {
         DB::transaction(function () use ($data) {
-            $group = ChatGroup::create([
+            $group = ChatGroup::updateOrCreate([
+                'group_key' => $data['GroupId'],
+            ], [
                 'name' => $data['Name'],
                 'type' => $data['Type']
             ]);
@@ -88,7 +91,6 @@ class ExecuteTimEvent
                 $owner = User::query()->where('username', $data['Owner_Account'])->first();
                 $group->increment('member_num');
                 $group->owner()->associate($owner);
-                $group->group_key = $data['GroupId'];
                 $group->save();
 
                 $groupUser = new ChatGroupUser();
