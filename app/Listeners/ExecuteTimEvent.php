@@ -157,17 +157,25 @@ class ExecuteTimEvent implements ShouldQueue
     public function sendGroupMessage($data)
     {
         $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
-        $user = User::query()->where('username', $data['From_Account'])->first();
-        $message = new ChatGroupMessage([
-            'body' => $data['MsgBody'],
-            'random' => $data['Random'],
-            'msg_seq' => $data['MsgSeq'],
-            'online_only_flag' => $data['OnlineOnlyFlag']
-        ]);
-        $message->group()->associate($group);
-        $message->user()->associate($user);
-        $message->sent_at = Carbon::createFromTimestamp($data['MsgTime']);
-        $message->save();
+        $message = ChatGroupMessage::query()->where('msg_seq', $data['MsgSeq'])->where('group_id', $group->id)->first();
+        if(!$message) {
+            $user = User::query()->where('username', $data['From_Account'])->first();
+            $groupUser = ChatGroupUser::query()->where('user_id', $user->id)->first();
+            $time = Carbon::createFromTimestamp($data['MsgTime']);
+            $message = new ChatGroupMessage([
+                'body' => $data['MsgBody'],
+                'random' => $data['Random'],
+                'msg_seq' => $data['MsgSeq'],
+                'online_only_flag' => $data['OnlineOnlyFlag']
+            ]);
+            $message->group()->associate($group);
+            $message->user()->associate($user);
+            $message->sent_at = $time;
+            $message->save();
+
+            $groupUser->last_send_msg_at = $time;
+            $groupUser->save();
+        }
     }
 
     public function recallGroupMessage($data)
@@ -180,19 +188,22 @@ class ExecuteTimEvent implements ShouldQueue
 
     public function sendMessage($data)
     {
-        $user = User::query()->where('username', $data['From_Account'])->first();
-        $toUser = User::query()->where('username', $data['To_Account'])->first();
-        $message = new ChatMessage([
-            'body' => $data['MsgBody'],
-            'random' => $data['MsgRandom'],
-            'msg_seq' => $data['MsgSeq'],
-            'msg_key' => $data['MsgKey'],
-            'online_only_flag' => $data['OnlineOnlyFlag']
-        ]);
-        $message->user()->associate($user);
-        $message->toUser()->associate($toUser);
-        $message->sent_at = Carbon::createFromTimestamp($data['MsgTime']);
-        $message->save();
+        $message = ChatMessage::query()->where('msg_key', $data['MsgKey'])->first();
+        if (!$message) {
+            $user = User::query()->where('username', $data['From_Account'])->first();
+            $toUser = User::query()->where('username', $data['To_Account'])->first();
+            $message = new ChatMessage([
+                'body' => $data['MsgBody'],
+                'random' => $data['MsgRandom'],
+                'msg_seq' => $data['MsgSeq'],
+                'msg_key' => $data['MsgKey'],
+                'online_only_flag' => $data['OnlineOnlyFlag']
+            ]);
+            $message->user()->associate($user);
+            $message->toUser()->associate($toUser);
+            $message->sent_at = Carbon::createFromTimestamp($data['MsgTime']);
+            $message->save();
+        }
     }
 
     public function withdrawMessage($data)
