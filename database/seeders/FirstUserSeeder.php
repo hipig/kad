@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class FirstUserSeeder extends Seeder
 {
@@ -17,7 +18,7 @@ class FirstUserSeeder extends Seeder
             'username' => 'administrator'
         ], [
             'nickname' => '超级管理员',
-            'wallet_account' => 'administrator'
+            'wallet_account' => Str::random()
         ]);
     }
 }
