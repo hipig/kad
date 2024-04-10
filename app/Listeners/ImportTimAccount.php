@@ -11,8 +11,6 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class ImportTimAccount implements ShouldQueue
 {
-    public $afterCommit = true;
-
     /**
      * Create the event listener.
      */

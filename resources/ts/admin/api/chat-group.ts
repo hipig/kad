@@ -36,6 +36,10 @@ export function joinChatGroups(groupId, data) {
     return axios.post<ChatGroupRecord[]>('chat-groups/' + groupId + '/join', data);
 }
 
+export function exitChatGroups(groupId, data) {
+    return axios.post<ChatGroupRecord[]>('chat-groups/' + groupId + '/exit', data);
+}
+
 export function chatGroupUsers(params) {
     return axios.get<ChatGroupUserRecord>('chat-group-users', {params});
 }

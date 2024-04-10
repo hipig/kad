@@ -19,8 +19,8 @@
         </Panel>
         <AModal :width="640" v-model:visible="createVisible" title="发送消息" @before-ok="handleCreateMessage">
             <AForm ref="createFormRef" :model="createForm" layout="vertical">
-                <AFormItem field="to_user_id" label="接收用户" :rules="[{required: true, message: '接收用户不能为空'}]">
-                    <AInput v-model="createForm.to_user_id" placeholder="请输入" allow-clear/>
+                <AFormItem field="to_user_ids" label="接收用户" :rules="[{required: true, message: '接收用户不能为空'}]">
+                    <ASelect v-model="createForm.to_user_ids" :options="userOptions" :loading="userLoading" placeholder="请选择新成员" multiple @search="handleUserSearch" :filter-option="false" />
                 </AFormItem>
                 <AFormItem field="text" label="消息内容" :rules="[{required: true, message: '消息内容不能为空'}]">
                     <ATextarea v-model="createForm.text" placeholder="请输入" allow-clear/>
@@ -32,13 +32,19 @@
 
 <script lang="tsx" setup>
 import {chatMessages, storeChatMessages, withdrawChatMessages} from "@admin/api/chat-message";
-import {ref} from "vue";
+import {ref, computed, onMounted} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
+import {users} from "@admin/api/user";
 
 const router = useRouter();
 
 const columns = [
+    {
+        dataIndex: 'msg_seq',
+        title: '消息KEY',
+        width: 120
+    },
     {
         dataIndex: 'from_user',
         title: '发送用户',
@@ -107,9 +113,35 @@ const createVisible = ref(false);
 const createFormRef = ref();
 
 const createForm = ref({
-    to_user_id: '',
+    to_user_ids: [],
     text: ''
 })
+
+const userLoading = ref(false);
+
+const userList = ref([]);
+
+const userOptions = computed(() => {
+    return userList.value.map(item => {
+        return {
+            value: item.id,
+            label: item.nickname + '-' + item.wallet_account
+        }
+    })
+})
+
+onMounted(async () => {
+    await getUserList();
+})
+
+const getUserList = async (keyword = '') => {
+    const res = await users({
+        keyword,
+        page_size: 20
+    });
+    userList.value = res.data;
+}
+
 const renderData = async ({ current }) => {
     return await chatMessages({
         page: current

@@ -33,8 +33,9 @@ class ExecuteTimEvent implements ShouldQueue
         $timEvent = $event->getEvent();
         $data = $timEvent->data;
 
-
-        if ($timEvent->platform === TimEvent::PLATFORM_RESTAPI || ($timEvent->type === TimEvent::TYPE_PROFILE_SET && $data['Operator_Account'] === User::USERNAME_ADMINISTRATOR)) {
+        if (!is_null($timEvent->executed_at) ||
+            $timEvent->platform === TimEvent::PLATFORM_RESTAPI ||
+            ($timEvent->type === TimEvent::TYPE_PROFILE_SET && $data['Operator_Account'] === User::USERNAME_ADMINISTRATOR)) {
             return;
         }
 
@@ -89,15 +90,22 @@ class ExecuteTimEvent implements ShouldQueue
 
             if ($data['Owner_Account']) {
                 $owner = User::query()->where('username', $data['Owner_Account'])->first();
-                $group->increment('member_num');
                 $group->owner()->associate($owner);
                 $group->save();
+            }
 
-                $groupUser = new ChatGroupUser();
-                $groupUser->user()->associate($owner);
-                $groupUser->role = ChatGroupUser::ROLE_OWNER;
-                $groupUser->join_at = now();
-                $groupUser->save();
+            if ($data['MemberList']) {
+                $users = User::query()->whereIn('username', array_column($data['MemberList'], 'Member_Account'))->get();
+                foreach ($users as $user) {
+                    $group->increment('member_num');
+                    $user->increment('chat_group_count');
+                    $groupUser = new ChatGroupUser();
+                    $groupUser->group()->associate($group);
+                    $groupUser->user()->associate($user);
+                    $groupUser->role = $user->id === $group->owner_id ? ChatGroupUser::ROLE_OWNER : ChatGroupUser::TYPE_MEMBER;
+                    $groupUser->join_at = now();
+                    $groupUser->save();
+                }
             }
         });
     }
@@ -173,10 +181,10 @@ class ExecuteTimEvent implements ShouldQueue
     public function sendMessage($data)
     {
         $user = User::query()->where('username', $data['From_Account'])->first();
-        $toUser = User::query()->where('username', $data['to_Account'])->first();
+        $toUser = User::query()->where('username', $data['To_Account'])->first();
         $message = new ChatMessage([
             'body' => $data['MsgBody'],
-            'random' => $data['Random'],
+            'random' => $data['MsgRandom'],
             'msg_seq' => $data['MsgSeq'],
             'msg_key' => $data['MsgKey'],
             'online_only_flag' => $data['OnlineOnlyFlag']
@@ -190,7 +198,7 @@ class ExecuteTimEvent implements ShouldQueue
     public function withdrawMessage($data)
     {
         $user = User::query()->where('username', $data['From_Account'])->first();
-        $toUser = User::query()->where('username', $data['to_Account'])->first();
+        $toUser = User::query()->where('username', $data['To_Account'])->first();
         ChatMessage::query()->where('user_id', $user->id)->where('to_user_id', $toUser->id)->where('msg_key', $data['MsgKey'])->update([
             'status' => ChatMessage::STATUS_WITHDRAW
         ]);

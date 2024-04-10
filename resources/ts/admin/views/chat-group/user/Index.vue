@@ -6,9 +6,14 @@
                 ref="listDataRef"
                 :render-data="renderData"
                 :columns="columns"
+                :selection-disabled-method="getDisabledSelection"
             >
-                <template #actions>
+                <template #actions="{selectionRowKeys}">
                     <AButton type="primary" @click="addUserVisible = true">添加群成员</AButton>
+                    <AButton :disabled="selectionRowKeys.length === 0" @click="handleRemoveUser(selectionRowKeys)" type="primary" status="danger">解散群组</AButton>
+                </template>
+                <template #action="{record}">
+                    <AButton :disabled="record.status === 2" type="text" size="small" @click="handleRemoveUser([record.id])">删除群成员</AButton>
                 </template>
             </ListData>
         </Panel>
@@ -23,11 +28,11 @@
 </template>
 
 <script lang="tsx" setup>
-import {chatGroupUsers, joinChatGroups} from "@admin/api/chat-group";
+import {chatGroupUsers, joinChatGroups, exitChatGroups} from "@admin/api/chat-group";
 import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import {users} from "@admin/api/user";
-import {Message} from "@arco-design/web-vue";
+import {Message, Modal} from "@arco-design/web-vue";
 
 const route = useRoute();
 
@@ -62,7 +67,24 @@ const columns = [
         dataIndex: 'last_send_msg_at',
         title: '最后发言时间',
         width: 200
-    }
+    },
+    {
+        dataIndex: 'status',
+        title: '状态',
+        width: 120,
+        render: ({record}) => {
+            switch (record.status) {
+                case 1:
+                    return (
+                        <ATag color="arcoblue">正常</ATag>
+                    )
+                case 2:
+                    return (
+                        <ATag color="red">退出</ATag>
+                    )
+            }
+        }
+    },
 ];
 
 const groupId = ref(route.query.group_id);
@@ -136,5 +158,23 @@ const handleAddUser = async (done) => {
         Message.error(e.message);
         done(false);
     }
+}
+
+const handleRemoveUser = async (userIds) => {
+    Modal.confirm({
+        title: '删除群成员',
+        content: `确定删除 ${userIds.length} 个群成员？`,
+        closable: true,
+        onOk: async () => {
+            await exitChatGroups(groupId.value, {
+                group_user_ids: userIds
+            });
+            listDataRef.value.refreshData();
+        }
+    });
+}
+
+const getDisabledSelection = (record) => {
+    return record.status === 2;
 }
 </script>

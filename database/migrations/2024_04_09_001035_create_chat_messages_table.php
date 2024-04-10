@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable()->comment('用户ID');
             $table->unsignedBigInteger('to_user_id')->comment('接收用户ID');
             $table->unsignedInteger('random')->comment('随机数');
-            $table->unsignedBigInteger('msg_seq')->nullable()->comment('消息序列号');
+            $table->string('msg_seq', 64)->nullable()->comment('消息序列号');
             $table->string('msg_key', 64)->nullable()->comment('消息唯一标识');
             $table->json('body')->comment('消息体');
             $table->unsignedTinyInteger('online_only_flag')->default(0)->comment('在线消息');

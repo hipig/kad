@@ -33,6 +33,7 @@ Route::middleware('auth:admin_api')->group(function () {
     ]);
     Route::post('chat-groups/dissolve', [Admin\ChatGroupsController::class, 'dissolve'])->name('chat-groups.dissolve');
     Route::post('chat-groups/{group}/join', [Admin\ChatGroupsController::class, 'join'])->name('chat-groups.join');
+    Route::post('chat-groups/{group}/exit', [Admin\ChatGroupsController::class, 'exit'])->name('chat-groups.exit');
     Route::get('chat-group-users', [Admin\ChatGroupUsersController::class, 'index'])->name('chat-group-users.index');
 
     Route::post('chat-group-messages/send', [Admin\ChatGroupMessagesController::class, 'send'])->name('chat-group-messages.send');

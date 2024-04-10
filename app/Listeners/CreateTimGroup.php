@@ -8,7 +8,7 @@ use App\Http\Integrations\TencentIM\TencentIMConnector;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class CreateTimGroup
+class CreateTimGroup implements ShouldQueue
 {
     public $afterCommit = true;
     /**

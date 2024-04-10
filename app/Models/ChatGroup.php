@@ -27,7 +27,8 @@ class ChatGroup extends Model
     protected $fillable = [
         'name',
         'type',
-        'owner_id'
+        'owner_id',
+        'group_key'
     ];
 
     protected $casts = [

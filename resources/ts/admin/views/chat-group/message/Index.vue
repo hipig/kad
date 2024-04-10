@@ -29,6 +29,11 @@ const router = useRouter();
 
 const columns = [
     {
+        dataIndex: 'msg_seq',
+        title: '消息KEY',
+        width: 120
+    },
+    {
         dataIndex: 'group.name',
         title: '群组',
         width: 180
@@ -83,8 +88,6 @@ const columns = [
 ];
 
 const listDataRef = ref();
-
-const currentMessageIds = ref([]);
 
 const renderData = async ({ current }) => {
     return await chatGroupMessages({

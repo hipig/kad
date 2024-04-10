@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Events\ChatGroupCreated;
 use App\Events\ChatGroupDissolved;
+use App\Events\ChatGroupExited;
 use App\Events\ChatGroupJoined;
 use App\Events\ChatGroupMessageSent;
 use App\Http\Controllers\Controller;
@@ -73,7 +74,8 @@ class ChatGroupsController extends Controller
         $group = DB::transaction(function () use ($request, $group) {
             $silence = $request->silence ?? 0;
             $userIds = $request->user_ids;
-            $users = User::query()->whereIn('id', $userIds)->get();
+            $joinedUserIds = ChatGroupUser::query()->whereIn('user_id', $userIds)->where('status', ChatGroupUser::STATUS_NORMAL)->pluck('user_id')->toArray();
+            $users = User::query()->whereIn('id', array_diff($userIds, $joinedUserIds))->get();
 
             foreach ($users as $user) {
                 $group->increment('member_num');
@@ -88,6 +90,28 @@ class ChatGroupsController extends Controller
             }
             $usernameList = $users->pluck('username')->toArray();
             event(new ChatGroupJoined($group, $usernameList, $silence));
+
+            return $group;
+        });
+
+        return ChatGroupResource::make($group);
+    }
+
+    public function exit(Request $request, ChatGroup $group)
+    {
+        $group = DB::transaction(function () use ($request, $group) {
+            $silence = $request->silence ?? 0;
+            $groupUserIds = $request->group_user_ids;
+            $userIds = ChatGroupUser::query()->whereIn('id', $groupUserIds)->pluck('user_id');
+            $usernameList = User::query()->whereIn('id', $userIds)->pluck('username')->toArray();
+
+            $group->increment('member_num', count($userIds));
+            User::query()->whereIn('id', $userIds)->decrement('chat_group_count');
+            ChatGroupUser::query()->whereIn('id', $groupUserIds)->update([
+                'status' => ChatGroupUser::STATUS_EXIT
+            ]);
+
+            event(new ChatGroupExited($group, $usernameList, $silence));
 
             return $group;
         });

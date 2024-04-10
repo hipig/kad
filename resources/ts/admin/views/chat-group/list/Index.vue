@@ -57,7 +57,7 @@ const router = useRouter();
 const columns = [
     {
         dataIndex: 'group_key',
-        title: '群组ID',
+        title: '群组KEY',
         width: 180
     },
     {

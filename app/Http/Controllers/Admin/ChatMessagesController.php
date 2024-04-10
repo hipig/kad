@@ -24,35 +24,39 @@ class ChatMessagesController extends Controller
 
     public function store(Request $request)
     {
-        $message = DB::transaction(function () use ($request) {
+        $messages = DB::transaction(function () use ($request) {
             $user = User::query()->where('username', User::USERNAME_ADMINISTRATOR)->first();
             if ($userId = $request->user_id) {
                 $user = User::query()->where('id', $userId)->first();
             }
-            $toUser = User::query()->where('id', $request->to_user_id)->first();
+            $toUsers = User::query()->whereIn('id', $request->to_user_ids)->get();
 
-            $message = new ChatMessage([
-                'body' => [
-                    [
-                        'MsgType' => 'TIMTextElem',
-                        'MsgContent' => [
-                            "Text" => $request->input('text')
+            $messages = collect();
+            foreach ($toUsers as $toUser) {
+                $message = new ChatMessage([
+                    'body' => [
+                        [
+                            'MsgType' => 'TIMTextElem',
+                            'MsgContent' => [
+                                "Text" => $request->input('text')
+                            ]
                         ]
                     ]
-                ]
-            ]);
+                ]);
 
-            $message->user()->associate($user);
-            $message->toUser()->associate($toUser);
-            $message->sent_at = now();
-            $message->save();
+                $message->user()->associate($user);
+                $message->toUser()->associate($toUser);
+                $message->sent_at = now();
+                $message->save();
+                $messages->push($message);
 
-            event(new ChatMessageSent($message));
+                event(new ChatMessageSent($message));
+            }
 
-            return $message;
+            return $messages;
         });
 
-        return ChatMessageResource::make($message);
+        return ChatMessageResource::collection($messages);
     }
 
     public function withdraw(Request $request)

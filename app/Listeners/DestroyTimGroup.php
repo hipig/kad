@@ -8,7 +8,7 @@ use App\Http\Integrations\TencentIM\TencentIMConnector;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class DestroyTimGroup
+class DestroyTimGroup implements ShouldQueue
 {
     public $afterCommit = true;
     /**
@@ -26,9 +26,10 @@ class DestroyTimGroup
     {
         $group = $event->getChatGroup();
 
-        $connector = new TencentIMConnector();
+        if ($group->group_key) {
+            $connector = new TencentIMConnector();
 
-        $response = $connector->send(new GroupDestroyRequest($group->group_key));
-
+            $connector->send(new GroupDestroyRequest($group->group_key));
+        }
     }
 }
