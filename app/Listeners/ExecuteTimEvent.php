@@ -265,15 +265,16 @@ class ExecuteTimEvent implements ShouldQueue
 
     protected function stateChange($data)
     {
-        $toUser = User::query()->where('username', $data['To_Account'])->first();
+        $info = $data['Info'];
+        $toUser = User::query()->where('username', $info['To_Account'])->first();
         if ($toUser) {
-            DB::transaction(function () use ($toUser, $data) {
-                $toUser->online_status = $data['Action'];
+            DB::transaction(function () use ($toUser, $info) {
+                $toUser->online_status = $info['Action'];
                 $toUser->save();
 
                 $record = new UserOnlineRecord([
-                    'action' => $data['Action'],
-                    'reason' => $data['Reason']
+                    'action' => $info['Action'],
+                    'reason' => $info['Reason']
                 ]);
                 $record->user()->associate($toUser);
                 $record->save();
