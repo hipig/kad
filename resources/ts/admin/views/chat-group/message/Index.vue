@@ -16,6 +16,13 @@
                 </template>
             </ListData>
         </Panel>
+        <AModal :width="640" v-model:visible="bodyViewVisible" title="内容详情" :footer="false">
+            <div class="flex flex-col space-y-2">
+                <template v-for="body in bodyList">
+                    <component :is="body" />
+                </template>
+            </div>
+        </AModal>
     </div>
 </template>
 
@@ -54,13 +61,9 @@ const columns = [
         dataIndex: 'body',
         title: '消息内容',
         render: ({record}) => {
-            const bodyList = record.body.map(item => {
-                switch (item.MsgType) {
-                    case 'TIMTextElem':
-                        return item.MsgContent.Text;
-                }
-            });
-            return bodyList.join('');
+            return (
+                <AButton size="small" onClick={() => handleViewBody(record)}>查看详情</AButton>
+            );
         }
     },
     {
@@ -89,10 +92,74 @@ const columns = [
 
 const listDataRef = ref();
 
+const bodyViewVisible = ref(false);
+
+const bodyList = ref([]);
+
 const renderData = async ({ current }) => {
     return await chatGroupMessages({
         page: current
     })
+}
+
+const handleViewBody = (record) => {
+    bodyList.value = record.body.map(item => {
+        const content = item.MsgContent;
+        switch (item.MsgType) {
+            case 'TIMTextElem':
+                return (
+                    <div>{content.Text}</div>
+                );
+            case 'TIMLocationElem':
+                return (
+                    <ATooltip content={`${content.Latitude},${content.Longitude}`}>
+                        <ATag>位置：{content.Desc}</ATag>
+                    </ATooltip>
+                );
+            case 'TIMFaceElem':
+                return (
+                    <ATooltip content={content.Data}>
+                        <ATag>表情：[{content.Index}]</ATag>
+                    </ATooltip>
+                );
+            case 'TIMSoundElem':
+                return (
+                    <AButton href={content.Url}>
+                        {{
+                            default: () => '下载语音',
+                            icon: () => <IconDownload />
+                        }}
+                    </AButton>
+                );
+            case 'TIMImageElem':
+                const image = content.ImageInfoArray.find(item => item.Type === 2);
+                return (
+                    <AImage
+                        width="300"
+                        src={image?.URL}
+                    />
+                );
+            case 'TIMFileElem':
+                return (
+                    <AButton href={content.Url}>
+                        {{
+                            default: () => '下载文件',
+                            icon: () => <IconDownload />
+                        }}
+                    </AButton>
+                );
+            case 'TIMVideoFileElem':
+                return (
+                    <AButton href={content.VideoUrl}>
+                        {{
+                            default: () => '下载视频',
+                            icon: () => <IconDownload />
+                        }}
+                    </AButton>
+                );
+        }
+    });
+    bodyViewVisible.value = true;
 }
 
 const handleRecall = (messageIds) => {
