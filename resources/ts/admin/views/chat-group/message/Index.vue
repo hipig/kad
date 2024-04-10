@@ -17,9 +17,39 @@
             </ListData>
         </Panel>
         <AModal :width="640" v-model:visible="bodyViewVisible" title="内容详情" :footer="false">
-            <div class="flex flex-col space-y-2">
-                <template v-for="body in bodyList">
-                    <component :is="body" />
+            <div class="space-y-2">
+                <template v-for="({type, content}, _) in bodyList">
+                    <div v-if="type === 'TIMTextElem'">{{ content.Text }}</div>
+                    <ATooltip v-if="type === 'TIMLocationElem'" :content="`${content.Latitude},${content.Longitude}`">
+                        <ATag>位置：{{content.Desc}}</ATag>
+                    </ATooltip>
+                    <ATooltip v-if="type === 'TIMFaceElem'" :content="content.Data">
+                        <ATag>表情：[{{content.Index}}]</ATag>
+                    </ATooltip>
+                    <AButton v-if="type === 'TIMSoundElem'" :href="content.Url">
+                        <template #icon>
+                            <IconDownload />
+                        </template>
+                        <span>下载语音</span>
+                    </AButton>
+                    <template v-if="type === 'TIMImageElem'">
+                        <AImage
+                            height="200"
+                            :src="content?.URL"
+                        />
+                    </template>
+                    <AButton v-if="type === 'TIMFileElem'" :href="content.Url">
+                        <template #icon>
+                            <IconDownload />
+                        </template>
+                        <span>下载文件</span>
+                    </AButton>
+                    <AButton v-if="type === 'TIMVideoFileElem'" :href="content.VideoUrl">
+                        <template #icon>
+                            <IconDownload />
+                        </template>
+                        <span>下载视频</span>
+                    </AButton>
                 </template>
             </div>
         </AModal>
@@ -104,59 +134,15 @@ const renderData = async ({ current }) => {
 
 const handleViewBody = (record) => {
     bodyList.value = record.body.map(item => {
-        const content = item.MsgContent;
-        switch (item.MsgType) {
-            case 'TIMTextElem':
-                return (
-                    <div>{content.Text}</div>
-                );
-            case 'TIMLocationElem':
-                return (
-                    <ATooltip content={`${content.Latitude},${content.Longitude}`}>
-                        <ATag>位置：{content.Desc}</ATag>
-                    </ATooltip>
-                );
-            case 'TIMFaceElem':
-                return (
-                    <ATooltip content={content.Data}>
-                        <ATag>表情：[{content.Index}]</ATag>
-                    </ATooltip>
-                );
-            case 'TIMSoundElem':
-                return (
-                    <AButton href={content.Url}>
-                        {{
-                            default: () => '下载语音',
-                            icon: () => <IconDownload />
-                        }}
-                    </AButton>
-                );
-            case 'TIMImageElem':
-                const image = content.ImageInfoArray.find(item => item.Type === 2);
-                return (
-                    <AImage
-                        width="300"
-                        src={image?.URL}
-                    />
-                );
-            case 'TIMFileElem':
-                return (
-                    <AButton href={content.Url}>
-                        {{
-                            default: () => '下载文件',
-                            icon: () => <IconDownload />
-                        }}
-                    </AButton>
-                );
-            case 'TIMVideoFileElem':
-                return (
-                    <AButton href={content.VideoUrl}>
-                        {{
-                            default: () => '下载视频',
-                            icon: () => <IconDownload />
-                        }}
-                    </AButton>
-                );
+        let content = item.MsgContent;
+        const type = item.MsgType;
+        if (type === 'TIMImageElem') {
+            content = content.ImageInfoArray.find(item => item.Type === 2);
+        }
+
+        return {
+            type,
+            content
         }
     });
     bodyViewVisible.value = true;
