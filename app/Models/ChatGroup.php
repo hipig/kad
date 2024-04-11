@@ -28,7 +28,8 @@ class ChatGroup extends Model
         'name',
         'type',
         'owner_id',
-        'group_key'
+        'group_key',
+        'introduction'
     ];
 
     protected $casts = [

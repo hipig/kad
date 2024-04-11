@@ -7,6 +7,7 @@ use App\Events\ChatGroupDissolved;
 use App\Events\ChatGroupExited;
 use App\Events\ChatGroupJoined;
 use App\Events\ChatGroupMessageSent;
+use App\Events\ChatGroupUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChatGroupRequest;
 use App\Http\Resources\ChatGroupResource;
@@ -22,7 +23,7 @@ class ChatGroupsController extends Controller
 {
     public function index(Request $request)
     {
-        $groups = ChatGroup::filter($request->all(), ChatGroupFilter::class)->latest()->paginate($request->page_size ?? 15);
+        $groups = ChatGroup::filter($request->all(), ChatGroupFilter::class)->with(['owner'])->latest()->paginate($request->page_size ?? 15);
 
         return ChatGroupResource::collection($groups);
     }
@@ -53,6 +54,28 @@ class ChatGroupsController extends Controller
             return $group;
         });
 
+        return ChatGroupResource::make($group);
+    }
+
+    public function update(Request $request, ChatGroup $group)
+    {
+        $this->validate($request, [
+            'name' => 'required'
+        ]);
+
+        $group->fill(
+            $request->only(['name', 'introduction', 'notification'])
+        );
+        $group->save();
+
+        event(new ChatGroupUpdated($group));
+
+        return ChatGroupResource::make($group);
+    }
+
+    public function show(Request $request, ChatGroup $group)
+    {
+        $group->load(['owner']);
         return ChatGroupResource::make($group);
     }
 

@@ -28,7 +28,7 @@ Route::middleware('auth:admin_api')->group(function () {
 
     Route::apiResource('post-comments', Admin\PostCommentsController::class)->names('post-comments');
 
-    Route::apiResource('chat-groups', Admin\ChatGroupsController::class)->names('chat-groups')->parameters([
+    Route::apiResource('chat-groups', Admin\ChatGroupsController::class)->names('chat-groups')->only(['index', 'store', 'update', 'show'])->parameters([
         'chat-groups' => 'group'
     ]);
     Route::post('chat-groups/dissolve', [Admin\ChatGroupsController::class, 'dissolve'])->name('chat-groups.dissolve');

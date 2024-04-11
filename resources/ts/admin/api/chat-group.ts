@@ -28,6 +28,14 @@ export function storeChatGroups(data) {
     return axios.post<ChatGroupRecord>('chat-groups', data);
 }
 
+export function showChatGroups(groupId) {
+    return axios.get<ChatGroupRecord>('chat-groups/' + groupId);
+}
+
+export function updateChatGroups(groupId, data) {
+    return axios.put<ChatGroupRecord>('chat-groups/' + groupId, data);
+}
+
 export function dissolveChatGroups(data) {
     return axios.post<ChatGroupRecord[]>('chat-groups/dissolve', data);
 }

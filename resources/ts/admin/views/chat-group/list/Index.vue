@@ -14,7 +14,7 @@
                     <AButton :disabled="selectionRowKeys.length === 0" @click="handleDissolve(selectionRowKeys)" type="primary" status="danger">解散群组</AButton>
                 </template>
                 <template #action="{record}">
-                    <AButton type="text" size="small" @click="handleViewUser(record.id)">查看群成员</AButton>
+                    <AButton type="text" size="small" @click="handleViewDetail(record.id)">查看详情</AButton>
                     <AButton :disabled="record.status === 2" @click="handleSend([record.id])" type="text" size="small">发送消息</AButton>
                     <AButton :disabled="record.status === 2" @click="handleDissolve([record.id])" type="text" size="small">解散</AButton>
                 </template>
@@ -31,7 +31,7 @@
                     </ASelect>
                 </AFormItem>
                 <AFormItem field="owner_id" label="群主">
-                    <AInput v-model="createForm.owner_id" placeholder="请选择群主" allow-clear/>
+                    <ASelect v-model="createForm.owner_id" :options="userOptions" :loading="userLoading" placeholder="请选择群主" @search="handleUserSearch" :filter-option="false" />
                 </AFormItem>
             </AForm>
         </AModal>
@@ -48,9 +48,10 @@
 
 <script lang="tsx" setup>
 import {chatGroups, storeChatGroups, dissolveChatGroups, sendChatGroupMessages} from "@admin/api/chat-group";
-import {ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
+import {users} from "@admin/api/user";
 
 const router = useRouter();
 
@@ -70,7 +71,7 @@ const columns = [
         width: 200
     },
     {
-        dataIndex: 'owner.name',
+        dataIndex: 'owner.nickname',
         title: '群主',
         width: 200
     },
@@ -126,7 +127,33 @@ const sendForm = ref({
     text: ''
 })
 
+const userLoading = ref(false);
+
+const userList = ref([]);
+
+const userOptions = computed(() => {
+    return userList.value.map(item => {
+        return {
+            value: item.id,
+            label: item.nickname + '-' + item.wallet_account
+        }
+    })
+})
+
 const currentGroupIds = ref([]);
+
+
+onMounted(async () => {
+    await getUserList();
+})
+
+const getUserList = async (keyword = '') => {
+    const res = await users({
+        keyword,
+        page_size: 20
+    });
+    userList.value = res.data;
+}
 
 const renderData = async ({ current }) => {
     return await chatGroups({
@@ -134,9 +161,9 @@ const renderData = async ({ current }) => {
     })
 }
 
-const handleViewUser = async (groupId) => {
+const handleViewDetail = async (groupId) => {
     await router.push({
-        name: 'chat-group.user',
+        name: 'chat-group.detail',
         query: {
             group_id: groupId
         }

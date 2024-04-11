@@ -16,11 +16,11 @@ const CHAT_GROUP: AppRouteRecordRaw = {
             },
         },
         {
-            path: 'user',
-            name: 'chat-group.user',
-            component: () => import('@admin/views/chat-group/user/Index.vue'),
+            path: 'detail',
+            name: 'chat-group.detail',
+            component: () => import('@admin/views/chat-group/detail/Index.vue'),
             meta: {
-                title: '群组成员',
+                title: '群组详情',
             },
         },
         {
