@@ -4,7 +4,7 @@
         <div class="space-y-6">
             <Panel title="群基本信息">
                 <template #action>
-                    <AButton type="text" size="small" @click="handleEdit">编辑</AButton>
+                    <AButton type="text" :disabled="group.status === 2" size="small" @click="handleEdit">编辑</AButton>
                 </template>
                 <div class="w-full flex flex-col space-y-4">
                     <div class="flex items-center">
@@ -41,10 +41,20 @@
                     </div>
                     <div class="flex items-center">
                         <div class="flex-none">
+                            <div class="w-32 text-gray-400">群通知</div>
+                        </div>
+                        <div class="flex-auto">
+                            <div>{{ group.notification || '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="flex-none">
                             <div class="w-32 text-gray-400">群主</div>
                         </div>
                         <div class="flex-auto">
-                            <div>{{ group.owner_id ? group.owner.name : '-' }}</div>
+                            <div class="flex items-center space-x-2">
+                                <div>{{ group.owner?.nickname || '-' }}</div>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center">
@@ -65,7 +75,7 @@
                     :selection-disabled-method="getDisabledSelection"
                 >
                     <template #actions="{selectionRowKeys}">
-                        <AButton type="primary" @click="addUserVisible = true">添加群成员</AButton>
+                        <AButton type="primary" :disabled="group.status === 2" @click="addUserVisible = true">添加群成员</AButton>
                         <AButton :disabled="selectionRowKeys.length === 0" @click="handleRemoveUser(selectionRowKeys)" type="primary" status="danger">删除群成员</AButton>
                     </template>
                     <template #action="{record}">
@@ -103,6 +113,7 @@ import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import {users} from "@admin/api/user";
 import {Message, Modal} from "@arco-design/web-vue";
+import {cloneDeep} from "lodash";
 
 const route = useRoute();
 
@@ -252,19 +263,20 @@ const handleRemoveUser = async (userIds) => {
             await exitChatGroups(groupId.value, {
                 group_user_ids: userIds
             });
+            Message.success('操作成功');
             listDataRef.value.refreshData();
         }
     });
 }
 
 const handleEdit = () => {
-    updateForm.value = group.value;
+    updateForm.value = cloneDeep(group.value);
     updateVisible.value = true;
 }
 
 const handleUpdateGroup = async () => {
     await updateChatGroups(groupId.value, updateForm.value);
-    await showChatGroups(groupId.value);
+    await getChatGroupDetail();
 }
 
 const getDisabledSelection = (record) => {

@@ -119,7 +119,7 @@ const _columns = computed(() => {
             width: props.actionWidth,
             render: row => {
                 return (
-                    <div class="flex flex-wrap space-x-2">
+                    <div class="flex flex-wrap">
                         {slots.action(row)}
                     </div>
                 )

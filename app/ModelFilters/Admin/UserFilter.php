@@ -19,4 +19,24 @@ class UserFilter extends ModelFilter
     {
         return $this->where('nickname', 'like', "%{$keyword}%")->orWhere('wallet_account', $keyword);
     }
+
+    public function nickname($nickname)
+    {
+        return $this->where('nickname', 'like', "%{$nickname}%");
+    }
+
+    public function walletAccount($walletAccount)
+    {
+        return $this->where('wallet_account', $walletAccount);
+    }
+
+    public function username($username)
+    {
+        return $this->where('username', $username);
+    }
+
+    public function status($status)
+    {
+        return $this->where('status', $status);
+    }
 }

@@ -47,14 +47,16 @@ class PostsController extends Controller
             $repostPostId = $request->input('repost_post_id');
             $content = $request->input('content');
             $visibleStatus = $request->input('visible_status') ?? Post::VISIBLE_STATUS_COMMON;
+            $user = Auth::user();
             $post = new Post([
                 'repost_post_id' => $repostPostId,
                 'content' => $content,
                 'visible_status' => $visibleStatus
             ]);
             $post->published_at = now();
-            $post->user()->associate(Auth::user());
+            $post->user()->associate($user);
             $post->save();
+            $user->increment('post_count');
 
             $imageIds = is_array($request->image_ids) ? $request->image_ids : explode(',', $request->image_ids);
             $post->images()->sync(array_filter($imageIds));
@@ -64,7 +66,7 @@ class PostsController extends Controller
                 $post->repostPost->increment('repost_count');
                 $repost = new PostRepost();
                 $repost->post()->associate($post->repostPost);
-                $repost->user()->associate(Auth::user());
+                $repost->user()->associate($user);
                 $repost->repostedPost()->associate($post);
                 $repost->save();
             }

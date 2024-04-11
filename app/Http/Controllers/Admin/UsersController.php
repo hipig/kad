@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Events\UserCreated;
+use App\Events\UserDisabled;
 use App\Events\UserUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
@@ -57,5 +58,19 @@ class UsersController extends Controller
         });
 
         return UserResource::make($user);
+    }
+
+    public function changeStatus(User $user)
+    {
+        if ($user->status === User::STATUS_ENABLE) {
+            $user->status = User::STATUS_DISABLE;
+            $user->token()?->revoke();
+            $user->save();
+
+            event(new UserDisabled($user));
+        } else {
+            $user->status = User::STATUS_ENABLE;
+            $user->save();
+        }
     }
 }

@@ -32,16 +32,16 @@ class SetTimPortrait implements ShouldQueue
 
         $connector = new TencentIMConnector();
 
-        $tagItems = [];
+        $data = [];
         foreach (User::$associatedFieldMap as $field => $tag) {
             if ($user->$field) {
-                $tagItems[] = [
+                $data[] = [
                     'Tag' => $tag,
                     'Value' => $user->$field
                 ];
             }
         }
 
-        $connector->send(new PortraitSetRequest($user->username, array_filter($tagItems)));
+        $connector->send(new PortraitSetRequest($user->username, $data));
     }
 }

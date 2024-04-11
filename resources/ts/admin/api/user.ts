@@ -18,3 +18,7 @@ export function storeUsers(data) {
 export function updateUsers(userId, data) {
     return axios.put<UserRecord>('users/' + userId, data);
 }
+
+export function changeStatusUsers(userId) {
+    return axios.post<UserRecord>('users/' + userId + '/change-status');
+}

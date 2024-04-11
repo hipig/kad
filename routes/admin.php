@@ -20,6 +20,7 @@ Route::middleware('auth:admin_api')->group(function () {
     Route::delete('authorizations', [Admin\AuthorizationsController::class, 'destroy'])->name('authorizations.destroy');
 
     Route::apiResource('users', Admin\UsersController::class)->only(['index', 'store', 'update'])->names('users');
+    Route::post('users/{user}/change-status', [Admin\UsersController::class, 'changeStatus'])->name('users.change-status');
 
     Route::get('reports', [Admin\ReportsController::class, 'index'])->name('reports.index');
     Route::post('reports/handle', [Admin\ReportsController::class, 'handle'])->name('reports.handle');

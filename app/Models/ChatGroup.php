@@ -24,12 +24,27 @@ class ChatGroup extends Model
     const STATUS_NORMAL = 1;
     const STATUS_DISSOLVE = 2;
 
+    public static $associatedFieldMap = [
+        'name' => 'Name',
+        'avatar' => 'FaceUrl',
+        'introduction' => 'Introduction',
+        'notification' => 'Notification',
+        'max_member_num' => 'MaxMemberNum',
+        'mute_all_member' => 'MuteAllMember',
+    ];
+
     protected $fillable = [
         'name',
+        'avatar',
         'type',
         'owner_id',
         'group_key',
-        'introduction'
+        'introduction',
+        'notification',
+        'max_member_num',
+        'apply_join_option',
+        'invite_join_option',
+        'mute_all_member',
     ];
 
     protected $casts = [

@@ -100,6 +100,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
+        'status_text',
         'online_status_text'
     ];
 
@@ -165,15 +166,22 @@ class User extends Authenticatable
         });
     }
 
+    protected function statusText(): Attribute
+    {
+        return Attribute::get(function () {
+            return self::$statusMap[$this->status] ?? '';
+        });
+    }
+
     protected function avatar(): Attribute
     {
         return Attribute::make(
             function ($value) {
-                if (empty($value) || Str::startsWith($value, ['http://', 'https://'])) {
+                if (Str::startsWith($value, ['http://', 'https://'])) {
                     return $value;
                 }
 
-                return Storage::disk('upload')->url($value);
+                return empty($value) ? url('images/default_avatar.png') : Storage::disk('upload')->url($value);
             }
         );
     }

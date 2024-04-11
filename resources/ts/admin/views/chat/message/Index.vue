@@ -179,6 +179,12 @@ const getUserList = async (keyword = '') => {
     userList.value = res.data;
 }
 
+const handleUserSearch = async (value) => {
+    userLoading.value = true;
+    await getUserList(value);
+    userLoading.value = false;
+}
+
 const renderData = async ({ current }) => {
     return await chatMessages({
         page: current

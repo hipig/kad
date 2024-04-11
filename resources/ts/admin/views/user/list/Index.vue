@@ -2,6 +2,49 @@
     <div>
         <Breadcrumb :items="['用户管理', '用户列表']"></Breadcrumb>
         <Panel title="用户列表">
+            <div class="space-y-2 mb-4">
+                <AForm ref="filterFormRef" :model="filterForm" :label-col-props="{ span: 4 }" :wrapper-col-props="{ span: 20 }" label-align="left">
+                    <ARow :gutter="16">
+                        <ACol :span="6">
+                            <AFormItem field="nickname" label="昵称">
+                                <AInput v-model="filterForm.nickname" placeholder="请输入昵称" allow-clear />
+                            </AFormItem>
+                        </ACol>
+                        <ACol :span="6">
+                            <AFormItem field="wallet_account" label="钱包地址">
+                                <AInput v-model="filterForm.wallet_account" placeholder="请输入钱包地址" allow-clear />
+                            </AFormItem>
+                        </ACol>
+                        <ACol :span="6">
+                            <AFormItem field="username" label="用户名">
+                                <AInput v-model="filterForm.username" placeholder="请输入用户名" allow-clear />
+                            </AFormItem>
+                        </ACol>
+                        <ACol :span="6">
+                            <AFormItem field="status" label="状态">
+                                <ASelect v-model="filterForm.status" placeholder="请选择" allow-clear>
+                                    <AOption :value="1">启用</AOption>
+                                    <AOption :value="2">禁用</AOption>
+                                </ASelect>
+                            </AFormItem>
+                        </ACol>
+                    </ARow>
+                </AForm>
+                <div class="flex justify-end space-x-4">
+                    <AButton @click="handleFilter" type="primary">
+                        <template #icon>
+                            <IconSearch/>
+                        </template>
+                        <span>查询</span>
+                    </AButton>
+                    <AButton @click="handleFilterReset">
+                        <template #icon>
+                            <IconRefresh/>
+                        </template>
+                        <span>重置</span>
+                    </AButton>
+                </div>
+            </div>
             <ListData
                 ref="listDataRef"
                 :render-data="renderData"
@@ -12,6 +55,8 @@
                 </template>
                 <template #action="{record}">
                     <AButton @click="handleUpdate(record)" type="text" size="small">编辑</AButton>
+                    <AButton v-if="record.status === 1" @click="handleDisable(record)" type="text" size="small">禁用</AButton>
+                    <AButton v-if="record.status === 2" @click="handleEnable(record)" type="text" size="small">启用</AButton>
                 </template>
             </ListData>
         </Panel>
@@ -92,9 +137,9 @@
 </template>
 
 <script lang="tsx" setup>
-import {users, storeUsers, updateUsers} from "@admin/api/user";
+import {users, storeUsers, updateUsers, changeStatusUsers} from "@admin/api/user";
 import {ref} from "vue";
-import { Message } from '@arco-design/web-vue';
+import {Message, Modal} from '@arco-design/web-vue';
 import {cloneDeep} from "lodash";
 
 const columns = [
@@ -155,8 +200,21 @@ const columns = [
     {
         dataIndex: 'created_at',
         title: '注册时间'
+    },
+    {
+        dataIndex: 'status_text',
+        title: '状态'
     }
 ];
+
+const filterFormRef = ref();
+
+const filterForm = ref({
+   nickname: '',
+   wallet_account: '',
+   username: '',
+    status: ''
+});
 
 const listDataRef = ref();
 
@@ -197,8 +255,18 @@ const updateFileList = ref([]);
 
 const renderData = async ({ current }) => {
     return await users({
-        page: current
+        page: current,
+        ...filterForm.value
     })
+}
+
+const handleFilter = () => {
+    listDataRef.value.refreshData();
+}
+
+const handleFilterReset = async () => {
+    filterFormRef.value.resetFields();
+    listDataRef.value.refreshData();
 }
 
 const handleCreateUser = async (done) => {
@@ -219,6 +287,33 @@ const handleCreateUser = async (done) => {
         Message.error(e.message);
         done(false);
     }
+}
+
+const handleDisable = (record) => {
+    Modal.confirm({
+        title: '禁用该用户',
+        content: `禁用后用户将立即下线。`,
+        closable: true,
+        onOk: async () => {
+            await changeStatusUsers(record.id);
+            Message.success('操作成功');
+            listDataRef.value.refreshData();
+        }
+    });
+}
+
+const handleEnable = (record) => {
+
+    Modal.confirm({
+        title: '启用该用户',
+        content: `启用后用户可正常登录。`,
+        closable: true,
+        onOk: async () => {
+            await changeStatusUsers(record.id);
+            Message.success('操作成功');
+            listDataRef.value.refreshData();
+        }
+    });
 }
 
 const handleUpdate = async (record) => {

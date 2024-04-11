@@ -7,6 +7,7 @@
                 :render-data="renderData"
                 :columns="columns"
                 :selection-disabled-method="getDisabledSelection"
+                :action-width="210"
             >
                 <template #actions="{selectionRowKeys}">
                     <AButton @click="createVisible = true" type="primary">添加群组</AButton>
@@ -15,6 +16,8 @@
                 </template>
                 <template #action="{record}">
                     <AButton type="text" size="small" @click="handleViewDetail(record.id)">查看详情</AButton>
+                    <AButton v-if="record.mute_all_member === 'Off'" :disabled="record.status === 2" @click="handleMuteAllOn(record)" type="text" size="small">禁言</AButton>
+                    <AButton v-if="record.mute_all_member === 'On'" :disabled="record.status === 2" @click="handleMuteAllOff(record)" type="text" size="small">取消禁言</AButton>
                     <AButton :disabled="record.status === 2" @click="handleSend([record.id])" type="text" size="small">发送消息</AButton>
                     <AButton :disabled="record.status === 2" @click="handleDissolve([record.id])" type="text" size="small">解散</AButton>
                 </template>
@@ -47,7 +50,13 @@
 </template>
 
 <script lang="tsx" setup>
-import {chatGroups, storeChatGroups, dissolveChatGroups, sendChatGroupMessages} from "@admin/api/chat-group";
+import {
+    chatGroups,
+    storeChatGroups,
+    dissolveChatGroups,
+    sendChatGroupMessages,
+    updateChatGroups
+} from "@admin/api/chat-group";
 import {computed, onMounted, ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
@@ -64,6 +73,10 @@ const columns = [
     {
         dataIndex: 'name',
         title: '群组名称'
+    },
+    {
+        dataIndex: 'member_num',
+        title: '群成员数量'
     },
     {
         dataIndex: 'type_text',
@@ -155,6 +168,12 @@ const getUserList = async (keyword = '') => {
     userList.value = res.data;
 }
 
+const handleUserSearch = async (value) => {
+    userLoading.value = true;
+    await getUserList(value);
+    userLoading.value = false;
+}
+
 const renderData = async ({ current }) => {
     return await chatGroups({
         page: current
@@ -170,6 +189,36 @@ const handleViewDetail = async (groupId) => {
     })
 }
 
+const handleMuteAllOn = (group) => {
+    Modal.confirm({
+        title: '确定要禁言该群组？',
+        content: '禁言后群组所有成员不能发送消息。',
+        closable: true,
+        onOk: async () => {
+            await updateChatGroups(group.id, {
+                mute_all_member: 'On'
+            });
+            Message.success('操作成功');
+            listDataRef.value.refreshData();
+        }
+    });
+}
+
+const handleMuteAllOff = (group) => {
+    Modal.confirm({
+        title: '确定取消禁言该群组？',
+        content: '取消禁言后群组可正常发送消息。',
+        closable: true,
+        onOk: async () => {
+            await updateChatGroups(group.id, {
+                mute_all_member: 'Off'
+            });
+            Message.success('操作成功');
+            listDataRef.value.refreshData();
+        }
+    });
+}
+
 const handleDissolve = (groupIds) => {
     Modal.confirm({
         title: '确定要解散所选群组？',
@@ -179,6 +228,7 @@ const handleDissolve = (groupIds) => {
             await dissolveChatGroups({
                 group_ids: groupIds
             });
+            Message.success('操作成功');
             listDataRef.value.refreshData();
         }
     });

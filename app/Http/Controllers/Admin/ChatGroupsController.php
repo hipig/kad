@@ -8,6 +8,7 @@ use App\Events\ChatGroupExited;
 use App\Events\ChatGroupJoined;
 use App\Events\ChatGroupMessageSent;
 use App\Events\ChatGroupUpdated;
+use App\Exceptions\InvalidRequestException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChatGroupRequest;
 use App\Http\Resources\ChatGroupResource;
@@ -59,13 +60,14 @@ class ChatGroupsController extends Controller
 
     public function update(Request $request, ChatGroup $group)
     {
-        $this->validate($request, [
-            'name' => 'required'
-        ]);
+        if ($group->status === ChatGroup::STATUS_DISSOLVE) {
+            throw new InvalidRequestException('该群组已解散，不能修改');
+        }
 
         $group->fill(
-            $request->only(['name', 'introduction', 'notification'])
+            $request->only(['name', 'avatar', 'introduction', 'notification', 'max_member_num', 'apply_join_option', 'invite_join_option', 'mute_all_member'])
         );
+        $group->last_info_at = now();
         $group->save();
 
         event(new ChatGroupUpdated($group));
@@ -94,6 +96,10 @@ class ChatGroupsController extends Controller
 
     public function join(Request $request, ChatGroup $group)
     {
+        if ($group->status === ChatGroup::STATUS_DISSOLVE) {
+            throw new InvalidRequestException('该群组已解散，不能添加群成员');
+        }
+
         $group = DB::transaction(function () use ($request, $group) {
             $silence = $request->silence ?? 0;
             $userIds = $request->user_ids;
@@ -122,6 +128,10 @@ class ChatGroupsController extends Controller
 
     public function exit(Request $request, ChatGroup $group)
     {
+        if ($group->status === ChatGroup::STATUS_DISSOLVE) {
+            throw new InvalidRequestException('该群组已解散，不能删除群成员');
+        }
+
         $group = DB::transaction(function () use ($request, $group) {
             $silence = $request->silence ?? 0;
             $groupUserIds = $request->group_user_ids;

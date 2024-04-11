@@ -27,7 +27,7 @@ return new class extends Migration
             $table->unsignedInteger('max_member_num')->default(0)->comment('最大群成员数量');
             $table->string('apply_join_option', 64)->default('FreeAccess')->comment('申请加群处理方式');
             $table->string('invite_join_option', 64)->default('FreeAccess')->comment('邀请加群处理方式');
-            $table->string('mute_all_member', 64)->default('On')->comment('群全员禁言状态');
+            $table->string('mute_all_member', 64)->default('Off')->comment('群全员禁言状态');
             $table->json('defined_data')->nullable()->comment('自定义字段');
             $table->unsignedTinyInteger('status')->default(1)->comment('状态');
             $table->timestamps();
