@@ -16,4 +16,11 @@ class PostsController extends Controller
 
         return PostResource::collection($users);
     }
+
+    public function destroy(Post $post)
+    {
+        $post->delete();
+
+        return response()->noContent();
+    }
 }

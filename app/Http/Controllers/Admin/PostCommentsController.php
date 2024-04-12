@@ -16,4 +16,11 @@ class PostCommentsController extends Controller
 
         return PostCommentResource::collection($users);
     }
+
+    public function destroy(PostComment $comment)
+    {
+        $comment->delete();
+
+        return response()->noContent();
+    }
 }

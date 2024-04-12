@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\InvalidRequestException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\UserSearchRequest;
 use App\Http\Resources\ReportResource;
 use App\Http\Resources\UserResource;
+use App\ModelFilters\Api\UserFilter;
 use App\Models\Report;
 use App\Models\User;
 use App\TencentIM\TLSSigAPIv2;
@@ -14,6 +16,14 @@ use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
+
+    public function search(UserSearchRequest $request)
+    {
+        $users = User::filter($request->all(), UserFilter::class)->where('username', '<>', User::USERNAME_ADMINISTRATOR)->where('status', User::STATUS_ENABLE)->latest()->paginate($request->page_size ?? 15);
+
+        return UserResource::collection($users);
+    }
+
     public function show(Request $request, User $user)
     {
         return UserResource::make($user);

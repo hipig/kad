@@ -22,3 +22,7 @@ export function updateUsers(userId, data) {
 export function changeStatusUsers(userId) {
     return axios.post<UserRecord>('users/' + userId + '/change-status');
 }
+
+export function changeMePassword(data) {
+    return axios.post<UserRecord>('users/change-password', data);
+}

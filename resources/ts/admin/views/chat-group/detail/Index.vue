@@ -68,6 +68,31 @@
                 </div>
             </Panel>
             <Panel title="群成员管理">
+                <div class="space-y-2 mb-4">
+                    <AForm ref="filterFormRef" :model="filterForm" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }" label-align="left">
+                        <ARow :gutter="16">
+                            <ACol :span="6">
+                                <AFormItem field="user_ids" label="用戶">
+                                    <UserSelect v-model="filterForm.user_ids" multiple />
+                                </AFormItem>
+                            </ACol>
+                        </ARow>
+                    </AForm>
+                    <div class="flex justify-end space-x-4">
+                        <AButton @click="handleFilter" type="primary">
+                            <template #icon>
+                                <IconSearch/>
+                            </template>
+                            <span>查询</span>
+                        </AButton>
+                        <AButton @click="handleFilterReset">
+                            <template #icon>
+                                <IconRefresh/>
+                            </template>
+                            <span>重置</span>
+                        </AButton>
+                    </div>
+                </div>
                 <ListData
                     ref="listDataRef"
                     :render-data="renderData"
@@ -166,8 +191,11 @@ const columns = [
 
 const groupId = ref(route.query.group_id);
 
+const filterFormRef = ref();
+
 const filterForm = ref({
-    group_id: groupId.value
+    group_id: groupId.value,
+    user_ids: []
 });
 
 const listDataRef = ref();
@@ -233,6 +261,15 @@ const renderData = async ({ current }) => {
         page: current,
         ...filterForm.value
     })
+}
+
+const handleFilter = () => {
+    listDataRef.value.refreshData();
+}
+
+const handleFilterReset = async () => {
+    filterFormRef.value.resetFields();
+    listDataRef.value.refreshData();
 }
 
 const handleAddUser = async (done) => {

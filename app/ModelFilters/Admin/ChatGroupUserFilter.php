@@ -19,4 +19,9 @@ class ChatGroupUserFilter extends ModelFilter
     {
         return $this->where('group_id', $groupId);
     }
+
+    public function userIds($userIds)
+    {
+        return $this->whereIn('user_id', $userIds);
+    }
 }

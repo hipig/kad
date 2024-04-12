@@ -6,7 +6,7 @@ use EloquentFilter\ModelFilter;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class ChatGroupFilter extends ModelFilter
+class AdminUserFilter extends ModelFilter
 {
     /**
     * Related Models that have ModelFilters as well as the method on the ModelFilter
@@ -20,17 +20,4 @@ class ChatGroupFilter extends ModelFilter
     {
         return $this->where('name', 'like', "%{$name}%");
     }
-
-    public function owner($ownerId)
-    {
-        return $this->where('owner_id', $ownerId);
-    }
-
-    public function userIds($userIds)
-    {
-        return $this->whereHas('users', function (Builder $q) use ($userIds) {
-            $q->whereIn('user_id', $userIds);
-        });
-    }
-
 }

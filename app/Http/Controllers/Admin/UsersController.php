@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Events\UserCreated;
 use App\Events\UserDisabled;
 use App\Events\UserUpdated;
+use App\Exceptions\InvalidRequestException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ChangePasswordRequest;
 use App\Http\Requests\Admin\UserRequest;
 use App\Http\Resources\UserResource;
 use App\ModelFilters\Admin\UserFilter;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
@@ -60,10 +64,24 @@ class UsersController extends Controller
         return UserResource::make($user);
     }
 
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $user = Auth::user();
+        if (!Hash::check($request->old_password, $user->password)) {
+            throw new InvalidRequestException('当前密码错误');
+        }
+
+        $user->password = $request->password;
+        $user->save();
+
+        return UserResource::make($user);
+    }
+
     public function changeStatus(User $user)
     {
         if ($user->status === User::STATUS_ENABLE) {
             $user->status = User::STATUS_DISABLE;
+            $user->online_status = User::ONLINE_STATUS_LOGOUT;
             $user->token()?->revoke();
             $user->save();
 

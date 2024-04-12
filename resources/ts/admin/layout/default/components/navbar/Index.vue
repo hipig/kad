@@ -46,6 +46,12 @@
                     </a-avatar>
                     <template #content>
                         <a-doption>
+                            <a-space @click="handleChangePassword">
+                                <icon-export/>
+                                <span>修改密码</span>
+                            </a-space>
+                        </a-doption>
+                        <a-doption>
                             <a-space @click="handleLogout">
                                 <icon-export/>
                                 <span>退出登录</span>
@@ -55,6 +61,19 @@
                 </a-dropdown>
             </li>
         </ul>
+        <AModal :width="640" v-model:visible="passwordVisible" title="添加群组" @before-ok="handleChangePasswordConfirm">
+            <AForm ref="passwordFormRef" :model="passwordForm" layout="vertical">
+                <AFormItem field="old_password" label="当前密码" :rules="[{required: true, message: '当前密码不能为空'}]">
+                    <AInput type="password" v-model="passwordForm.old_password" placeholder="请输入当前密码" allow-clear/>
+                </AFormItem>
+                <AFormItem field="password" label="新密码" :rules="[{required: true, message: '新密码不能为空'}]">
+                    <AInput type="password" v-model="passwordForm.password" placeholder="请输入新密码" allow-clear/>
+                </AFormItem>
+                <AFormItem field="password_confirmation" label="重复新密码" :rules="[{required: true, message: '重复新密码不能为空'}]">
+                    <AInput type="password" v-model="passwordForm.password_confirmation" placeholder="请输入重复新密码" allow-clear/>
+                </AFormItem>
+            </AForm>
+        </AModal>
     </div>
 </template>
 
@@ -64,6 +83,10 @@ import {Message} from '@arco-design/web-vue';
 import {useDark, useToggle, useFullscreen} from '@vueuse/core';
 import {useAppStore, useUserStore} from '@admin/store';
 import useUser from '@admin/hooks/user';
+import {changeMePassword} from "@admin/api/user";
+import {useRouter} from "vue-router";
+
+const router = useRouter();
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -97,6 +120,15 @@ const handleToggleTheme = () => {
     toggleTheme();
 };
 
+const passwordVisible = ref(false);
+
+const passwordFormRef = ref();
+const passwordForm = ref({
+    old_password: '',
+    password: '',
+    password_confirmation: '',
+})
+
 const visible = ref(false);
 const setVisible = () => {
     visible.value = true;
@@ -111,6 +143,30 @@ const setPopoverVisible = () => {
     });
     refBtn.value.dispatchEvent(event);
 };
+
+const handleChangePassword = () => {
+    passwordVisible.value = true;
+}
+
+const handleChangePasswordConfirm = async (done) => {
+    try {
+        const validate = await passwordFormRef.value.validate();
+
+        if (validate) {
+            throw new Error(validate[Object.keys(validate)[0]].message || '请填写完整表单');
+        }
+
+        await changeMePassword(passwordForm.value);
+        done(true);
+        Message.success('操作成功，请重新登录');
+        await passwordFormRef.value.resetFields();
+        await userStore.logout();
+        await router.go(0);
+    } catch (e) {
+        done(false);
+    }
+}
+
 const handleLogout = () => {
     logout();
 };

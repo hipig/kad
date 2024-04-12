@@ -2,20 +2,50 @@
     <div>
         <Breadcrumb :items="['动态管理', '动态列表']"></Breadcrumb>
         <Panel title="动态列表">
+            <div class="space-y-2 mb-4">
+                <AForm ref="filterFormRef" :model="filterForm" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }" label-align="left">
+                    <ARow :gutter="16">
+                        <ACol :span="6">
+                            <AFormItem field="user_ids" label="评论用户">
+                                <UserSelect v-model="filterForm.user_ids" multiple placeholder="请选择用户" />
+                            </AFormItem>
+                        </ACol>
+                    </ARow>
+                </AForm>
+                <div class="flex justify-end space-x-4">
+                    <AButton @click="handleFilter" type="primary">
+                        <template #icon>
+                            <IconSearch/>
+                        </template>
+                        <span>查询</span>
+                    </AButton>
+                    <AButton @click="handleFilterReset">
+                        <template #icon>
+                            <IconRefresh/>
+                        </template>
+                        <span>重置</span>
+                    </AButton>
+                </div>
+            </div>
             <ListData
                 ref="listDataRef"
                 :render-data="renderData"
                 :columns="columns"
             >
+                <template #action="{record}">
+                    <AButton @click="handleDelete(record)" type="text" size="small">删除</AButton>
+                </template>
             </ListData>
         </Panel>
+        <AImagePreviewGroup v-model:visible="imagePreviewVisible" :src-list="imageSrcList" infinite/>
     </div>
 </template>
 
 <script lang="tsx" setup>
-import {posts} from "@admin/api/post";
+import {posts, destroyPosts} from "@admin/api/post";
 import {ref} from "vue";
-import { Message } from '@arco-design/web-vue';
+import {Message, Modal} from '@arco-design/web-vue';
+import UserSelect from "@admin/components/form/user-select/Index.vue";
 
 const columns = [
     {
@@ -33,6 +63,25 @@ const columns = [
     {
         dataIndex: 'content',
         title: '内容'
+    },
+    {
+        dataIndex: 'images',
+        title: '图片',
+        render: ({record}) => {
+            return (
+                <div>
+                    {
+                        record.images && record.images.length > 0 ?
+                            <AButton type="text" onClick={() => handlePreviewImageList(record)}>
+                                {{
+                                    icon: <IconImage />
+                                }}
+                            </AButton> :
+                            ''
+                    }
+                </div>
+            )
+        }
     },
     {
         dataIndex: 'visible_status_text',
@@ -64,11 +113,48 @@ const columns = [
     }
 ];
 
+const filterFormRef = ref();
+
+const filterForm = ref({
+    user_ids: []
+})
+
 const listDataRef = ref();
 
 const renderData = async ({ current }) => {
     return await posts({
         page: current
     })
+}
+
+const handleFilter = () => {
+    listDataRef.value.refreshData();
+}
+
+const handleFilterReset = async () => {
+    filterFormRef.value.resetFields();
+    listDataRef.value.refreshData();
+}
+
+const handleDelete= (record) => {
+    Modal.confirm({
+        title: '确定要删除该动态？',
+        content: '删除后该动态将不可见。',
+        closable: true,
+        onOk: async () => {
+            await destroyPosts(record.id);
+            Message.success('操作成功');
+            listDataRef.value.refreshData();
+        }
+    });
+}
+
+const imagePreviewVisible = ref(false);
+
+const imageSrcList = ref([]);
+
+const handlePreviewImageList = (record) => {
+    imageSrcList.value = record.images && record.images.map(item => item.url);
+    imagePreviewVisible.value = true;
 }
 </script>

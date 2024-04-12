@@ -2,6 +2,36 @@
     <div>
         <Breadcrumb :items="['聊天管理', '群组列表']"></Breadcrumb>
         <Panel title="群组列表">
+            <div class="space-y-2 mb-4">
+                <AForm ref="filterFormRef" :model="filterForm" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }" label-align="left">
+                    <ARow :gutter="16">
+                        <ACol :span="6">
+                            <AFormItem field="name" label="群名称">
+                                <AInput v-model="filterForm.name" placeholder="请输入群名称" allow-clear />
+                            </AFormItem>
+                        </ACol>
+                        <ACol :span="6">
+                            <AFormItem field="user_ids" label="发送用戶">
+                                <UserSelect v-model="filterForm.user_ids" multiple placeholder="请选择用户" />
+                            </AFormItem>
+                        </ACol>
+                    </ARow>
+                </AForm>
+                <div class="flex justify-end space-x-4">
+                    <AButton @click="handleFilter" type="primary">
+                        <template #icon>
+                            <IconSearch/>
+                        </template>
+                        <span>查询</span>
+                    </AButton>
+                    <AButton @click="handleFilterReset">
+                        <template #icon>
+                            <IconRefresh/>
+                        </template>
+                        <span>重置</span>
+                    </AButton>
+                </div>
+            </div>
             <ListData
                 ref="listDataRef"
                 :render-data="renderData"
@@ -61,6 +91,7 @@ import {chatGroupMessages, recallChatGroupMessages} from "@admin/api/chat-group"
 import {ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
+import UserSelect from "@admin/components/form/user-select/Index.vue";
 
 const router = useRouter();
 
@@ -120,6 +151,13 @@ const columns = [
     }
 ];
 
+const filterFormRef = ref();
+
+const filterForm = ref({
+    name: '',
+   user_ids: []
+});
+
 const listDataRef = ref();
 
 const bodyViewVisible = ref(false);
@@ -128,8 +166,18 @@ const bodyList = ref([]);
 
 const renderData = async ({ current }) => {
     return await chatGroupMessages({
-        page: current
+        page: current,
+        ...filterForm.value
     })
+}
+
+const handleFilter = () => {
+    listDataRef.value.refreshData();
+}
+
+const handleFilterReset = async () => {
+    filterFormRef.value.resetFields();
+    listDataRef.value.refreshData();
 }
 
 const handleViewBody = (record) => {

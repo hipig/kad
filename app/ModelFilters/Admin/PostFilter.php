@@ -19,4 +19,9 @@ class PostFilter extends ModelFilter
     {
         return $this->where('content', 'like', "%{$content}%");
     }
+
+    public function userIds($userIds)
+    {
+        return $this->whereIn('user_id', $userIds);
+    }
 }

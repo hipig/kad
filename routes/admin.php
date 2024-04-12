@@ -21,13 +21,16 @@ Route::middleware('auth:admin_api')->group(function () {
 
     Route::apiResource('users', Admin\UsersController::class)->only(['index', 'store', 'update'])->names('users');
     Route::post('users/{user}/change-status', [Admin\UsersController::class, 'changeStatus'])->name('users.change-status');
+    Route::post('users/change-password', [Admin\UsersController::class, 'changePassword'])->name('users.change-password');
 
     Route::get('reports', [Admin\ReportsController::class, 'index'])->name('reports.index');
     Route::post('reports/handle', [Admin\ReportsController::class, 'handle'])->name('reports.handle');
 
-    Route::apiResource('posts', Admin\PostsController::class)->names('posts');
+    Route::apiResource('posts', Admin\PostsController::class)->only(['index', 'destroy'])->names('posts');
 
-    Route::apiResource('post-comments', Admin\PostCommentsController::class)->names('post-comments');
+    Route::apiResource('post-comments', Admin\PostCommentsController::class)->only(['index', 'destroy'])->names('post-comments')->parameters([
+        'post-comments' => 'comment'
+    ]);;
 
     Route::apiResource('chat-groups', Admin\ChatGroupsController::class)->names('chat-groups')->only(['index', 'store', 'update', 'show'])->parameters([
         'chat-groups' => 'group'

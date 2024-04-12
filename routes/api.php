@@ -24,6 +24,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('me', [V1\AuthorizationsController::class, 'me'])->name('authorizations.me');
         Route::get('user_sign', [V1\UsersController::class, 'userSign'])->name('users.user_sign');
 
+        Route::get('users/search', [V1\UsersController::class, 'search'])->name('users.search');
         Route::get('users/{user}', [V1\UsersController::class, 'show'])->name('users.show');
         Route::get('users/{user}/following', [V1\UserFollowersController::class, 'following'])->name('users.following');
         Route::get('users/{user}/followers', [V1\UserFollowersController::class, 'followers'])->name('users.followers');

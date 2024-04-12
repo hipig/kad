@@ -16,8 +16,15 @@ class NotificationsController extends Controller
 
         $query = $user->notifications();
 
-        if ($type = $request->input('type')) {
-            $query->where('type', $type);
+        $type = $request->input('type');
+
+        switch ($type) {
+            case 'Commented':
+                $query->whereIn('type', ['PostCommented', 'PostCommentCommented']);
+                break;
+            case 'Liked':
+                $query->whereIn('type', ['PostLiked', 'PostCommentLiked']);
+                break;
         }
 
         if ($request->boolean('unread')) {

@@ -15,4 +15,8 @@ class ChatMessageFilter extends ModelFilter
     */
     public $relations = [];
 
+    public function userIds($userIds)
+    {
+        return $this->whereIn('user_id', $userIds);
+    }
 }

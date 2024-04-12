@@ -158,26 +158,31 @@ class ExecuteTimEvent implements ShouldQueue
 
     public function sendGroupMessage($data)
     {
-        $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
-        $message = ChatGroupMessage::query()->where('msg_seq', $data['MsgSeq'])->where('group_id', $group->id)->first();
-        if(!$message) {
-            $user = User::query()->where('username', $data['From_Account'])->first();
-            $groupUser = ChatGroupUser::query()->where('user_id', $user->id)->first();
-            $time = Carbon::createFromTimestamp($data['MsgTime']);
-            $message = new ChatGroupMessage([
-                'body' => $data['MsgBody'],
-                'random' => $data['Random'],
-                'msg_seq' => $data['MsgSeq'],
-                'online_only_flag' => $data['OnlineOnlyFlag']
-            ]);
-            $message->group()->associate($group);
-            $message->user()->associate($user);
-            $message->sent_at = $time;
-            $message->save();
+        DB::transaction(function () use ($data) {
+            $group = ChatGroup::query()->where('group_key', $data['GroupId'])->first();
+            if (!$group) {
+                return;
+            }
+            $message = ChatGroupMessage::query()->where('msg_seq', $data['MsgSeq'])->where('group_id', $group->id)->first();
+            if(!$message) {
+                $user = User::query()->where('username', $data['From_Account'])->first();
+                $groupUser = ChatGroupUser::query()->where('user_id', $user->id)->first();
+                $time = Carbon::createFromTimestamp($data['MsgTime']);
+                $message = new ChatGroupMessage([
+                    'body' => $data['MsgBody'],
+                    'random' => $data['Random'],
+                    'msg_seq' => $data['MsgSeq'],
+                    'online_only_flag' => $data['OnlineOnlyFlag']
+                ]);
+                $message->group()->associate($group);
+                $message->user()->associate($user);
+                $message->sent_at = $time;
+                $message->save();
 
-            $groupUser->last_send_msg_at = $time;
-            $groupUser->save();
-        }
+                $groupUser->last_send_msg_at = $time;
+                $groupUser->save();
+            }
+        });
     }
 
     public function recallGroupMessage($data)

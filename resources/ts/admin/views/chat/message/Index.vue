@@ -2,6 +2,31 @@
     <div>
         <Breadcrumb :items="['聊天管理', '单聊消息']"></Breadcrumb>
         <Panel title="单聊消息">
+            <div class="space-y-2 mb-4">
+                <AForm ref="filterFormRef" :model="filterForm" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }" label-align="left">
+                    <ARow :gutter="16">
+                        <ACol :span="6">
+                            <AFormItem field="user_ids" label="发送用戶">
+                                <UserSelect v-model="filterForm.user_ids" multiple placeholder="请选择用户" />
+                            </AFormItem>
+                        </ACol>
+                    </ARow>
+                </AForm>
+                <div class="flex justify-end space-x-4">
+                    <AButton @click="handleFilter" type="primary">
+                        <template #icon>
+                            <IconSearch/>
+                        </template>
+                        <span>查询</span>
+                    </AButton>
+                    <AButton @click="handleFilterReset">
+                        <template #icon>
+                            <IconRefresh/>
+                        </template>
+                        <span>重置</span>
+                    </AButton>
+                </div>
+            </div>
             <ListData
                 ref="listDataRef"
                 :render-data="renderData"
@@ -20,7 +45,7 @@
         <AModal :width="640" v-model:visible="createVisible" title="发送消息" @before-ok="handleCreateMessage">
             <AForm ref="createFormRef" :model="createForm" layout="vertical">
                 <AFormItem field="to_user_ids" label="接收用户" :rules="[{required: true, message: '接收用户不能为空'}]">
-                    <ASelect v-model="createForm.to_user_ids" :options="userOptions" :loading="userLoading" placeholder="请选择新成员" multiple @search="handleUserSearch" :filter-option="false" />
+                    <UserSelect v-model="createForm.to_user_ids" multiple placeholder="请选择用户" />
                 </AFormItem>
                 <AFormItem field="text" label="消息内容" :rules="[{required: true, message: '消息内容不能为空'}]">
                     <ATextarea v-model="createForm.text" placeholder="请输入" allow-clear/>
@@ -73,6 +98,7 @@ import {ref, computed, onMounted} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
 import {users} from "@admin/api/user";
+import UserSelect from "@admin/components/form/user-select/Index.vue";
 
 const router = useRouter();
 
@@ -139,6 +165,12 @@ const columns = [
     }
 ];
 
+const filterFormRef = ref();
+
+const filterForm = ref({
+    user_ids: []
+})
+
 const listDataRef = ref();
 
 const createVisible = ref(false);
@@ -150,45 +182,24 @@ const createForm = ref({
     text: ''
 })
 
-const userLoading = ref(false);
-
-const userList = ref([]);
-
-const userOptions = computed(() => {
-    return userList.value.map(item => {
-        return {
-            value: item.id,
-            label: item.nickname + '-' + item.wallet_account
-        }
-    })
-})
-
 const bodyViewVisible = ref(false);
 
 const bodyList = ref([]);
 
-onMounted(async () => {
-    await getUserList();
-})
-
-const getUserList = async (keyword = '') => {
-    const res = await users({
-        keyword,
-        page_size: 20
-    });
-    userList.value = res.data;
-}
-
-const handleUserSearch = async (value) => {
-    userLoading.value = true;
-    await getUserList(value);
-    userLoading.value = false;
-}
-
 const renderData = async ({ current }) => {
     return await chatMessages({
-        page: current
+        page: current,
+        ...filterForm.value
     })
+}
+
+const handleFilter = () => {
+    listDataRef.value.refreshData();
+}
+
+const handleFilterReset = async () => {
+    filterFormRef.value.resetFields();
+    listDataRef.value.refreshData();
 }
 
 const handleViewBody = (record) => {
