@@ -44,7 +44,12 @@ class AuthorizationsController extends Controller
 
     public function me(Request $request)
     {
-        return UserResource::make($request->user());
+        $user = $request->user();
+        if ($user->status != User::STATUS_ENABLE) {
+            throw new InvalidRequestException('用户已禁用');
+        }
+
+        return UserResource::make($user);
     }
 
     protected function respondWithToken($token)

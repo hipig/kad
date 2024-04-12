@@ -47,8 +47,11 @@ class UsersController extends Controller
     public function userSign(Request $request)
     {
         $user = Auth::user();
-        $sign = app(TLSSigAPIv2::class)->genUserSig($user->username, 86400 * 7);
+        if ($user->status != User::STATUS_ENABLE) {
+            throw new InvalidRequestException('用户已禁用');
+        }
 
+        $sign = app(TLSSigAPIv2::class)->genUserSig($user->username, 86400 * 7);
         return response()->json(['user_sign' => $sign]);
     }
 }
