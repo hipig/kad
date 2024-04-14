@@ -77,6 +77,18 @@ class PostsController extends Controller
         return PostResource::make($post);
     }
 
+    public function repost(Post $post)
+    {
+        $repost = $post->replicate();
+        $repost->repost_post_id = $post->id;
+        $repost->save();
+
+        $repost->images()->sync($post->images);
+        $repost->load('images');
+
+        return PostResource::make($repost);
+    }
+
     public function show(Post $post)
     {
         $post->load(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers']);
