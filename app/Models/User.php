@@ -120,6 +120,11 @@ class User extends Authenticatable
         });
     }
 
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable')->latest();
+    }
+
     public function following()
     {
         return $this->belongsToMany(User::class, 'user_followers', 'follower_id', 'user_id');

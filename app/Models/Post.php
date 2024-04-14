@@ -60,7 +60,7 @@ class Post extends Model
 
     public function comments()
     {
-        return $this->hasMany(PostComment::class, 'post_id');
+        return $this->hasMany(PostComment::class, 'post_id')->whereNull('comment_id');
     }
 
     public function repostUsers()

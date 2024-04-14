@@ -31,7 +31,7 @@ class PostsController extends Controller
 {
     public function index(Request $request)
     {
-        $posts = Post::filter($request->all(), PostFilter::class)->with(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers'])->whereNotNull('published_at')->latest('published_at')->latest()->paginate($request->page_size ?? 15);
+        $posts = Post::filter($request->all(), PostFilter::class)->with(['user', 'images', 'comments', 'comments.user', 'repostPost', 'repostUsers'])->whereNotNull('published_at')->latest('published_at')->latest()->paginate($request->page_size ?? 15);
 
         $follows = UserFollower::query()->where('follower_id', Auth::id())->whereIn('user_id', $posts->getCollection()->pluck('user_id'))->get();
         foreach ($posts->getCollection() as $item) {
@@ -80,6 +80,7 @@ class PostsController extends Controller
     public function repost(Post $post)
     {
         $repost = $post->replicate();
+        $repost->user()->associate(Auth::user());
         $repost->repost_post_id = $post->id;
         $repost->save();
 
@@ -91,7 +92,7 @@ class PostsController extends Controller
 
     public function show(Post $post)
     {
-        $post->load(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers']);
+        $post->load(['user', 'images', 'comments', 'comments.user', 'repostPost', 'repostUsers']);
 
         $follow = UserFollower::query()->where('follower_id', Auth::id())->where('user_id', $post->user_id)->first();
         $post->is_followed = !!$follow;
