@@ -101,10 +101,10 @@
                 >
                     <template #actions="{selectionRowKeys}">
                         <AButton type="primary" :disabled="group.status === 2" @click="addUserVisible = true">添加群成员</AButton>
-                        <AButton :disabled="selectionRowKeys.length === 0" @click="handleRemoveUser(selectionRowKeys)" type="primary" status="danger">删除群成员</AButton>
+                        <AButton :disabled="selectionRowKeys.length === 0 || group.status === 2" @click="handleRemoveUser(selectionRowKeys)" type="primary" status="danger">删除群成员</AButton>
                     </template>
                     <template #action="{record}">
-                        <AButton :disabled="record.status === 2" type="text" size="small" @click="handleRemoveUser([record.id])">删除群成员</AButton>
+                        <AButton :disabled="record.status === 2 || group.status === 2" type="text" size="small" @click="handleRemoveUser([record.id])">删除群成员</AButton>
                     </template>
                 </ListData>
             </Panel>
@@ -317,6 +317,6 @@ const handleUpdateGroup = async () => {
 }
 
 const getDisabledSelection = (record) => {
-    return record.status === 2;
+    return record.status === 2 || group.value.status === 2;
 }
 </script>
