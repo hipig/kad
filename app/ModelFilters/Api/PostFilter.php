@@ -21,28 +21,29 @@ class PostFilter extends ModelFilter
     public function type($type)
     {
         $user = Auth::user();
-        $query = $this;
+        $query = $this->where('visible_status', Post::VISIBLE_STATUS_COMMON);
         switch ($type) {
             case 'recommend':
+                $query->inRandomOrder()->where('user_id', '<>', $user->id);
                 break;
             case 'following':
                 $followingIds = UserFollower::query()->where('follower_id', $user->id)->pluck('user_id');
-                $query->whereIn('user_id', $followingIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                $query->whereIn('user_id', $followingIds);
                 break;
             case 'like':
                 $likePostIds = $user->postLikes()->pluck('post_id');
-                $query->whereIn('id', $likePostIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                $query->whereIn('id', $likePostIds);
                 break;
             case 'collect':
                 $collectPostIds = $user->postCollects()->pluck('post_id');
-                $query->whereIn('id', $collectPostIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                $query->whereIn('id', $collectPostIds);
                 break;
             case 'comment':
                 $commentPostIds = PostComment::query()->where('user_id', $user->id)->pluck('post_id');
-                $query->whereIn('id', $commentPostIds)->where('visible_status', Post::VISIBLE_STATUS_COMMON);
+                $query->whereIn('id', $commentPostIds);
                 break;
             case 'myself':
-                $query->where('user_id', $user->id)->latest('top_at');
+                $query = $this->where('user_id', $user->id)->latest('top_at');
                 break;
         }
 
