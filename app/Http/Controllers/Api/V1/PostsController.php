@@ -92,7 +92,7 @@ class PostsController extends Controller
 
     public function show(Post $post)
     {
-        $post->load(['user', 'images', 'comments', 'comments.user', 'comments.comments', 'repostPost', 'repostUsers']);
+        $post->load(['user', 'images', 'comments', 'comments.user', 'repostPost', 'repostUsers']);
 
         $follow = UserFollower::query()->where('follower_id', Auth::id())->where('user_id', $post->user_id)->first();
         $post->is_followed = !!$follow;

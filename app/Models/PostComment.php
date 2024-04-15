@@ -14,7 +14,8 @@ class PostComment extends Model
     ];
 
     protected $with  = [
-        'selfLike'
+        'selfLike',
+        'comments'
     ];
 
     protected $appends = [
