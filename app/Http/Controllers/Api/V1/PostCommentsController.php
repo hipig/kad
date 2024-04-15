@@ -58,6 +58,7 @@ class PostCommentsController extends Controller
         );
         $subComment->user()->associate(Auth::user());
         $subComment->comment()->associate($comment);
+        $subComment->commentUser()->associate($comment->user);
         $subComment->post()->associate($comment->post);
         $subComment->save();
 
