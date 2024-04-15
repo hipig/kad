@@ -83,7 +83,8 @@ const listDataRef = ref();
 
 const renderData = async ({ current }) => {
     return await postComments({
-        page: current
+        page: current,
+        ...filterForm.value
     })
 }
 

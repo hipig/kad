@@ -123,7 +123,8 @@ const listDataRef = ref();
 
 const renderData = async ({ current }) => {
     return await posts({
-        page: current
+        page: current,
+        ...filterForm.value
     })
 }
 

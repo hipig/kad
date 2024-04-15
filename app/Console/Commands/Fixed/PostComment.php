@@ -28,7 +28,7 @@ class PostComment extends Command
         $comments = \App\Models\PostComment::query()->with(['comment', 'comment.user'])->whereNotNull('comment_id')->get();
 
         foreach ($comments as $comment) {
-            $comment->commentUser()->associate($comment->user);
+            $comment->commentUser()->associate($comment->comment?->user);
             $comment->save();
         }
     }
