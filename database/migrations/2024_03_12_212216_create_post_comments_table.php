@@ -15,6 +15,7 @@ return new class extends Migration
             $table->comment('动态评论');
             $table->id();
             $table->unsignedBigInteger('comment_id')->nullable()->comment('上级评论ID');
+            $table->unsignedBigInteger('comment_user_id')->nullable()->comment('上级评论用户ID');
             $table->unsignedBigInteger('post_id')->comment('动态ID');
             $table->unsignedBigInteger('user_id')->comment('用户ID');
             $table->text('content')->nullable()->comment('内容');

@@ -125,12 +125,6 @@
                         <AOption value="AdminForbid_Type_SendOut">禁止该用户发起加好友请求</AOption>
                     </ASelect>
                 </AFormItem>
-                <AFormItem field="status" label="状态">
-                    <ASelect v-model="updateForm.status" placeholder="请选择状态">
-                        <AOption :value="1">启用</AOption>
-                        <AOption :value="2">禁用</AOption>
-                    </ASelect>
-                </AFormItem>
             </AForm>
         </AModal>
     </div>

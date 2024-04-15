@@ -14,13 +14,12 @@ class PostComment extends Model
     ];
 
     protected $with  = [
-        'selfLike',
-        'comments'
+        'selfLike'
     ];
 
     protected $appends = [
         'is_self',
-        'is_liked',
+        'is_liked'
     ];
 
     public function comment()
@@ -28,9 +27,14 @@ class PostComment extends Model
         return $this->belongsTo(PostComment::class, 'comment_id');
     }
 
+    public function commentUser()
+    {
+        return $this->belongsTo(User::class, 'comment_user_id');
+    }
+
     public function comments()
     {
-        return $this->hasMany(PostComment::class, 'comment_id');
+        return $this->hasMany(PostComment::class, 'comment_id')->with(['user', 'commentUser']);
     }
 
     public function user()
