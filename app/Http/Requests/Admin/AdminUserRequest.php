@@ -15,13 +15,23 @@ class AdminUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        if ($this->isMethod('PUT')) {
+            return [
+                'name' => 'required',
+                'username' => [
+                    'required',
+                    Rule::unique('admin_users')->ignore($this->route('user')),
+                ],
+            ];
+        }
+
         return [
             'name' => 'required',
             'username' => [
                 'required',
-                Rule::unique('users')->ignore($this->route('user')),
+                Rule::unique('admin_users'),
             ],
-            'password' => 'required||min:6'
+            'password' => 'required|min:6'
         ];
     }
 }

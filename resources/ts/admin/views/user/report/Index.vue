@@ -156,7 +156,7 @@ const handleHandleConfirm = async (done) => {
         handleFormRef.value.resetFields();
         listDataRef.value.refreshData();
     } catch (e) {
-        Message.error(e.message);
+
         done(false);
     }
 }

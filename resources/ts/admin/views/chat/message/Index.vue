@@ -36,6 +36,7 @@
                 <template #actions="{selectionRowKeys}">
                     <AButton @click="createVisible = true" type="primary">发送消息</AButton>
                     <AButton :disabled="selectionRowKeys.length === 0" @click="handleWithdraw(selectionRowKeys)" type="primary">批量撤回</AButton>
+                    <Export :export-data="exportData" file-name="单聊记录列表" />
                 </template>
                 <template #action="{record}">
                     <AButton :disabled="record.status === 2" @click="handleWithdraw([record.id])" type="text" size="small">撤回</AButton>
@@ -93,12 +94,13 @@
 </template>
 
 <script lang="tsx" setup>
-import {chatMessages, storeChatMessages, withdrawChatMessages} from "@admin/api/chat-message";
+import {chatMessages, exportChatMessages, storeChatMessages, withdrawChatMessages} from "@admin/api/chat-message";
 import {ref, computed, onMounted} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
 import {users} from "@admin/api/user";
 import UserSelect from "@admin/components/form/user-select/Index.vue";
+import Export from "@admin/components/common/list-data/actions/export/Index.vue";
 
 const router = useRouter();
 
@@ -193,6 +195,12 @@ const renderData = async ({ current }) => {
     })
 }
 
+const exportData = async () => {
+    return await exportChatMessages({
+        ...filterForm.value
+    })
+}
+
 const handleFilter = () => {
     listDataRef.value.refreshData();
 }
@@ -232,7 +240,7 @@ const handleCreateMessage = async (done) => {
         createFormRef.value.resetFields();
         listDataRef.value.refreshData();
     } catch (e) {
-        Message.error(e.message);
+
         done(false);
     }
 }

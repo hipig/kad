@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\PostCommentExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PostCommentResource;
 use App\ModelFilters\Admin\PostCommentFilter;
@@ -22,5 +23,10 @@ class PostCommentsController extends Controller
         $comment->delete();
 
         return response()->noContent();
+    }
+
+    public function export(Request $request)
+    {
+        return (new PostCommentExport($request->all()))->download('动态评论列表.xlsx');
     }
 }

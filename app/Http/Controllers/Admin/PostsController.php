@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\PostExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResource;
 use App\ModelFilters\Admin\PostFilter;
@@ -22,5 +23,10 @@ class PostsController extends Controller
         $post->delete();
 
         return response()->noContent();
+    }
+
+    public function export(Request $request)
+    {
+        return (new PostExport($request->all()))->download('动态列表.xlsx');
     }
 }

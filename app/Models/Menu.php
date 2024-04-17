@@ -9,7 +9,11 @@ class Menu extends Model
 {
     use HasRoles;
 
+    const TYPE_MENU = 'MENU';
+    const TYPE_BUTTON = 'BUTTON';
+
     protected $fillable = [
+        'type',
         'name',
         'key',
         'path',
@@ -38,7 +42,7 @@ class Menu extends Model
 
     public function guardName()
     {
-        return 'api';
+        return 'admin_api';
     }
 
     public static function sort($treeData)

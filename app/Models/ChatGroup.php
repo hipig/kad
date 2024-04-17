@@ -24,6 +24,11 @@ class ChatGroup extends Model
     const STATUS_NORMAL = 1;
     const STATUS_DISSOLVE = 2;
 
+    public static $statusMap = [
+        self::STATUS_NORMAL => '正常',
+        self::STATUS_DISSOLVE => '解散'
+    ];
+
     public static $associatedFieldMap = [
         'name' => 'Name',
         'avatar' => 'FaceUrl',
@@ -53,7 +58,8 @@ class ChatGroup extends Model
     ];
 
     protected $appends = [
-        'type_text'
+        'type_text',
+        'status_text'
     ];
 
     public function owner()
@@ -69,7 +75,14 @@ class ChatGroup extends Model
     protected function typeText(): Attribute
     {
         return Attribute::get(function () {
-            return self::$typeMap[$this->type];
+            return self::$typeMap[$this->type] ?? '';
+        });
+    }
+
+    protected function statusText(): Attribute
+    {
+        return Attribute::get(function () {
+            return self::$statusMap[$this->status] ?? '';
         });
     }
 }

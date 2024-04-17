@@ -6,6 +6,7 @@ import {
     me,
 } from '@admin/api/authorization';
 import {removeRouteListener} from '@admin/utils/route-listener';
+import useAppStore from './app';
 
 // @ts-ignore
 const useUserStore = defineStore('adminUser', {
@@ -40,11 +41,13 @@ const useUserStore = defineStore('adminUser', {
         },
         // Logout
         async logout() {
+            const appStore = useAppStore();
             try {
                 await userLogout();
             } finally {
                 this.resetInfo();
                 removeRouteListener();
+                appStore.clearServerMenu();
             }
         },
         setToken(token: string) {

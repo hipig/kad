@@ -6,6 +6,7 @@ use App\Events\UserCreated;
 use App\Events\UserDisabled;
 use App\Events\UserUpdated;
 use App\Exceptions\InvalidRequestException;
+use App\Exports\UserExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChangePasswordRequest;
 use App\Http\Requests\Admin\UserRequest;
@@ -16,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
@@ -64,19 +66,6 @@ class UsersController extends Controller
         return UserResource::make($user);
     }
 
-    public function changePassword(ChangePasswordRequest $request)
-    {
-        $user = Auth::user();
-        if (!Hash::check($request->old_password, $user->password)) {
-            throw new InvalidRequestException('当前密码错误');
-        }
-
-        $user->password = $request->password;
-        $user->save();
-
-        return UserResource::make($user);
-    }
-
     public function changeStatus(User $user)
     {
         if ($user->status === User::STATUS_ENABLE) {
@@ -90,5 +79,12 @@ class UsersController extends Controller
             $user->status = User::STATUS_ENABLE;
             $user->save();
         }
+
+        return UserResource::make($user);
+    }
+
+    public function export(Request $request)
+    {
+        return (new UserExport($request->all()))->download('用户列表.xlsx');
     }
 }

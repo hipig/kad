@@ -32,6 +32,9 @@
                 :render-data="renderData"
                 :columns="columns"
             >
+                <template #actions="{selectionRowKeys}">
+                    <Export :export-data="exportData" file-name="动态评论列表" />
+                </template>
                 <template #action="{record}">
                     <AButton @click="handleDelete(record)" type="text" size="small">删除</AButton>
                 </template>
@@ -41,10 +44,11 @@
 </template>
 
 <script lang="tsx" setup>
-import {postComments, destroyComments} from "@admin/api/post";
+import {postComments, destroyComments, exportComments} from "@admin/api/post";
 import {ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import UserSelect from "@admin/components/form/user-select/Index.vue";
+import Export from "@admin/components/common/list-data/actions/export/Index.vue";
 
 const columns = [
     {
@@ -68,6 +72,16 @@ const columns = [
         title: '动态内容'
     },
     {
+        dataIndex: 'comment_count',
+        title: '回复数',
+        align: 'center'
+    },
+    {
+        dataIndex: 'like_count',
+        title: '点赞数',
+        align: 'center'
+    },
+    {
         dataIndex: 'created_at',
         title: '创建时间'
     }
@@ -84,6 +98,12 @@ const listDataRef = ref();
 const renderData = async ({ current }) => {
     return await postComments({
         page: current,
+        ...filterForm.value
+    })
+}
+
+const exportData = async () => {
+    return await exportComments({
         ...filterForm.value
     })
 }

@@ -20,4 +20,14 @@ class AdminUserFilter extends ModelFilter
     {
         return $this->where('name', 'like', "%{$name}%");
     }
+
+    public function username($username)
+    {
+        return $this->where('username', $username);
+    }
+
+    public function status($status)
+    {
+        return $this->where('status', $status);
+    }
 }

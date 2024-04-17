@@ -37,9 +37,25 @@ axios.interceptors.response.use(
                 await userStore.clearToken();
                 window.location.reload();
                 break;
-            case 403:
-                Message.error(response.data.message || '此操作权限不足');
+            case 400:
+                if (!response.data.error_type) {
+                    Message.error(response.data.message || '');
+                }
                 break;
+            case 403:
+            case 404:
+            case 500:
+                Message.error(response.data.message || '服务器错误');
+                break;
+            case 422:
+                const errors = response.data.errors;
+                const errorKeys = Object.keys(errors);
+                console.log(errorKeys)
+                if (errorKeys.length > 0) {
+                    Message.error(errors[errorKeys[0]][0] || '');
+                }
+                break;
+
             default:
                 Message.error(response.data.message || '服务器内部错误');
         }

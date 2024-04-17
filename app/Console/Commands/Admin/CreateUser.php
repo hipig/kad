@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Admin;
 
 use App\Models\AdminUser;
+use App\Models\Role;
 use Illuminate\Console\Command;
 
 class CreateUser extends Command
@@ -29,12 +30,18 @@ class CreateUser extends Command
         $username = $this->ask('请输入用户名');
         $name = $this->ask('请输入昵称');
         $password = $this->secret('请输入密码');
+        $roleName = $this->ask('请输入角色');
 
-        AdminUser::create([
+        $user = AdminUser::create([
             'username' => $username,
             'name' => $name,
             'password' => $password
         ]);
+
+        $role = Role::query()->where('name', $roleName)->first();
+        if ($role) {
+            $role->users()->attach($user);
+        }
 
         $this->info("创建用户 {$name} 成功");
     }

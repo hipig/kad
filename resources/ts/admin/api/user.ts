@@ -23,6 +23,6 @@ export function changeStatusUsers(userId) {
     return axios.post<UserRecord>('users/' + userId + '/change-status');
 }
 
-export function changeMePassword(data) {
-    return axios.post<UserRecord>('users/change-password', data);
+export function exportUsers(params) {
+    return axios.get('users/export', {params, responseType: 'blob'});
 }

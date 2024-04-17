@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Events\ChatGroupMessageRecalled;
 use App\Events\ChatGroupMessageSent;
+use App\Exports\ChatGroupMessageExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ChatGroupMessageResource;
 use App\ModelFilters\Admin\ChatGroupMessageFilter;
@@ -66,5 +67,10 @@ class ChatGroupMessagesController extends Controller
         }
 
         return ChatGroupMessageResource::collection($messages);
+    }
+
+    public function export(Request $request)
+    {
+        return (new ChatGroupMessageExport($request->all()))->download('群聊记录列表.xlsx');
     }
 }

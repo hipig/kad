@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 class ChatMessage extends Model
 {
     const STATUS_NORMAL = 1;
     const STATUS_WITHDRAW= 2;
+
+    public static $statusMap = [
+        self::STATUS_NORMAL => '正常',
+        self::STATUS_WITHDRAW => '撤回'
+    ];
 
     protected $fillable = [
         'body',
@@ -18,6 +25,10 @@ class ChatMessage extends Model
     protected $casts = [
         'body' => 'array',
         'sent_at' => 'datetime'
+    ];
+
+    protected $appends = [
+        'status_text'
     ];
 
     protected static function boot()
@@ -38,5 +49,12 @@ class ChatMessage extends Model
     public function toUser()
     {
         return $this->belongsTo(User::class, 'to_user_id');
+    }
+
+    protected function statusText(): Attribute
+    {
+        return Attribute::get(function () {
+            return self::$statusMap[$this->status] ?? '';
+        });
     }
 }

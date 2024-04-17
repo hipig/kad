@@ -48,6 +48,10 @@ export function exitChatGroups(groupId, data) {
     return axios.post<ChatGroupRecord[]>('chat-groups/' + groupId + '/exit', data);
 }
 
+export function exportChatGroups(params) {
+    return axios.get('chat-groups/export', {params, responseType: 'blob'});
+}
+
 export function chatGroupUsers(params) {
     return axios.get<ChatGroupUserRecord>('chat-group-users', {params});
 }
@@ -58,4 +62,8 @@ export function sendChatGroupMessages(data) {
 
 export function recallChatGroupMessages(data) {
     return axios.post<ChatGroupMessageRecord[]>('chat-group-messages/recall', data);
+}
+
+export function exportChatGroupMessages(params) {
+    return axios.get('chat-group-messages/export', {params, responseType: 'blob'});
 }

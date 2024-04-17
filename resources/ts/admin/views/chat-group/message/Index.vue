@@ -40,6 +40,7 @@
             >
                 <template #actions="{selectionRowKeys}">
                     <AButton :disabled="selectionRowKeys.length === 0" @click="handleRecall(selectionRowKeys)" type="primary">批量撤回</AButton>
+                    <Export :export-data="exportData" file-name="群组消息列表" />
                 </template>
                 <template #action="{record}">
                     <AButton :disabled="record.status === 2" @click="handleRecall([record.id])" type="text" size="small">撤回</AButton>
@@ -87,11 +88,12 @@
 </template>
 
 <script lang="tsx" setup>
-import {chatGroupMessages, recallChatGroupMessages} from "@admin/api/chat-group";
+import {chatGroupMessages, exportChatGroupMessages, recallChatGroupMessages} from "@admin/api/chat-group";
 import {ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
 import UserSelect from "@admin/components/form/user-select/Index.vue";
+import Export from "@admin/components/common/list-data/actions/export/Index.vue";
 
 const router = useRouter();
 
@@ -167,6 +169,12 @@ const bodyList = ref([]);
 const renderData = async ({ current }) => {
     return await chatGroupMessages({
         page: current,
+        ...filterForm.value
+    })
+}
+
+const exportData = async () => {
+    return await exportChatGroupMessages({
         ...filterForm.value
     })
 }

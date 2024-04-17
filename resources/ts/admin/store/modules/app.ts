@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import {Notification} from '@arco-design/web-vue';
 import type {RouteRecordNormalized} from 'vue-router';
-import {currentMenu, RouteRecord} from '@admin/api/menu';
+import {currentMenus, RouteRecord} from '@admin/api/menu';
 
 export interface AppState {
     theme: string;
@@ -78,7 +78,7 @@ const useAppStore = defineStore('app', {
         },
         async fetchServerMenuConfig() {
             try {
-                this.serverMenu = await currentMenu();
+                this.serverMenu = await currentMenus();
             } catch (e) {
                 Notification.error({
                     id: 'menuNotice',

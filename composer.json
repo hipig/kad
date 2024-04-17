@@ -12,6 +12,7 @@
         "laravel/passport": "^11.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "maatwebsite/excel": "^3.1",
         "saloonphp/laravel-http-sender": "^2.0",
         "saloonphp/laravel-plugin": "^3.0",
         "saloonphp/saloon": "^3.0",

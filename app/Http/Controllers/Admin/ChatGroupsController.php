@@ -9,6 +9,7 @@ use App\Events\ChatGroupJoined;
 use App\Events\ChatGroupMessageSent;
 use App\Events\ChatGroupUpdated;
 use App\Exceptions\InvalidRequestException;
+use App\Exports\ChatGroupExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChatGroupRequest;
 use App\Http\Resources\ChatGroupResource;
@@ -150,5 +151,10 @@ class ChatGroupsController extends Controller
         });
 
         return ChatGroupResource::make($group);
+    }
+
+    public function export(Request $request)
+    {
+        return (new ChatGroupExport($request->all()))->download('群组列表.xlsx');
     }
 }

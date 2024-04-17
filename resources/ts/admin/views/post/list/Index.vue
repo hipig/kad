@@ -6,7 +6,7 @@
                 <AForm ref="filterFormRef" :model="filterForm" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }" label-align="left">
                     <ARow :gutter="16">
                         <ACol :span="6">
-                            <AFormItem field="user_ids" label="评论用户">
+                            <AFormItem field="user_ids" label="发布用户">
                                 <UserSelect v-model="filterForm.user_ids" multiple placeholder="请选择用户" />
                             </AFormItem>
                         </ACol>
@@ -32,6 +32,9 @@
                 :render-data="renderData"
                 :columns="columns"
             >
+                <template #actions="{selectionRowKeys}">
+                    <Export :export-data="exportData" file-name="动态列表" />
+                </template>
                 <template #action="{record}">
                     <AButton @click="handleDelete(record)" type="text" size="small">删除</AButton>
                 </template>
@@ -42,10 +45,11 @@
 </template>
 
 <script lang="tsx" setup>
-import {posts, destroyPosts} from "@admin/api/post";
+import {posts, destroyPosts, exportPosts} from "@admin/api/post";
 import {ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import UserSelect from "@admin/components/form/user-select/Index.vue";
+import Export from "@admin/components/common/list-data/actions/export/Index.vue";
 
 const columns = [
     {
@@ -103,11 +107,6 @@ const columns = [
         align: 'center'
     },
     {
-        dataIndex: 'view_count',
-        title: '浏览数',
-        align: 'center'
-    },
-    {
         dataIndex: 'created_at',
         title: '创建时间'
     }
@@ -118,6 +117,12 @@ const filterFormRef = ref();
 const filterForm = ref({
     user_ids: []
 })
+
+const exportData = async () => {
+    return await exportPosts({
+        ...filterForm.value
+    })
+}
 
 const listDataRef = ref();
 

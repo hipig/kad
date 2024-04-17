@@ -48,6 +48,7 @@
                     <AButton @click="createVisible = true" type="primary">添加群组</AButton>
                     <AButton :disabled="selectionRowKeys.length === 0" @click="handleSend(selectionRowKeys)" type="primary">发送消息</AButton>
                     <AButton :disabled="selectionRowKeys.length === 0" @click="handleDissolve(selectionRowKeys)" type="primary" status="danger">解散群组</AButton>
+                    <Export :export-data="exportData" file-name="群组列表" />
                 </template>
                 <template #action="{record}">
                     <AButton type="text" size="small" @click="handleViewDetail(record.id)">查看详情</AButton>
@@ -69,7 +70,7 @@
                     </ASelect>
                 </AFormItem>
                 <AFormItem field="owner_id" label="群主">
-                    <ASelect v-model="createForm.owner_id" :options="userOptions" :loading="userLoading" placeholder="请选择群主" @search="handleUserSearch" :filter-option="false" />
+                    <UserSelect v-model="createForm.owner_id" placeholder="请选择群主" />
                 </AFormItem>
             </AForm>
         </AModal>
@@ -90,13 +91,13 @@ import {
     storeChatGroups,
     dissolveChatGroups,
     sendChatGroupMessages,
-    updateChatGroups
+    updateChatGroups, exportChatGroups
 } from "@admin/api/chat-group";
 import {computed, onMounted, ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {useRouter} from "vue-router";
-import {users} from "@admin/api/user";
 import UserSelect from "@admin/components/form/user-select/Index.vue";
+import Export from "@admin/components/common/list-data/actions/export/Index.vue";
 
 const router = useRouter();
 
@@ -184,43 +185,18 @@ const sendForm = ref({
     text: ''
 })
 
-const userLoading = ref(false);
-
-const userList = ref([]);
-
-const userOptions = computed(() => {
-    return userList.value.map(item => {
-        return {
-            value: item.id,
-            label: item.nickname + '-' + item.wallet_account
-        }
-    })
-})
 
 const currentGroupIds = ref([]);
-
-
-onMounted(async () => {
-    await getUserList();
-})
-
-const getUserList = async (keyword = '') => {
-    const res = await users({
-        keyword,
-        page_size: 20
-    });
-    userList.value = res.data;
-}
-
-const handleUserSearch = async (value) => {
-    userLoading.value = true;
-    await getUserList(value);
-    userLoading.value = false;
-}
 
 const renderData = async ({ current }) => {
     return await chatGroups({
         page: current,
+        ...filterForm.value
+    })
+}
+
+const exportData = async () => {
+    return await exportChatGroups({
         ...filterForm.value
     })
 }
@@ -307,7 +283,7 @@ const handleCreateGroup = async (done) => {
         createFormRef.value.resetFields();
         listDataRef.value.refreshData();
     } catch (e) {
-        Message.error(e.message);
+
         done(false);
     }
 }
@@ -329,7 +305,7 @@ const handleSendMessage = async (done) => {
         sendFormRef.value.resetFields();
         listDataRef.value.refreshData();
     } catch (e) {
-        Message.error(e.message);
+
         done(false);
     }
 }

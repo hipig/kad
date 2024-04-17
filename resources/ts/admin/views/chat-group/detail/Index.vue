@@ -73,7 +73,7 @@
                         <ARow :gutter="16">
                             <ACol :span="6">
                                 <AFormItem field="user_ids" label="用戶">
-                                    <UserSelect v-model="filterForm.user_ids" multiple />
+                                    <UserSelect v-model="filterForm.user_ids" multiple placeholder="请选择用户" />
                                 </AFormItem>
                             </ACol>
                         </ARow>
@@ -112,7 +112,7 @@
         <AModal :width="640" v-model:visible="addUserVisible" title="添加群成员" @before-ok="handleAddUser">
             <AForm ref="addUserFormRef" :model="addUserForm" layout="vertical">
                 <AFormItem field="user_ids" label="新成员" :rules="[{required: true, message: '新成员不能为空'}]">
-                    <ASelect v-model="addUserForm.user_ids" :options="userOptions" :loading="userLoading" placeholder="请选择新成员" multiple @search="handleUserSearch" :filter-option="false" />
+                    <UserSelect v-model="addUserForm.user_ids" multiple placeholder="请选择新成员" />
                 </AFormItem>
             </AForm>
         </AModal>
@@ -136,9 +136,9 @@
 import {showChatGroups, updateChatGroups, chatGroupUsers, joinChatGroups, exitChatGroups} from "@admin/api/chat-group";
 import {computed, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
-import {users} from "@admin/api/user";
 import {Message, Modal} from "@arco-design/web-vue";
 import {cloneDeep} from "lodash";
+import UserSelect from "@admin/components/form/user-select/Index.vue";
 
 const route = useRoute();
 
@@ -220,40 +220,12 @@ const updateForm = ref({
     notification: ''
 })
 
-const userLoading = ref(false);
-
-const userList = ref([]);
-
-const userOptions = computed(() => {
-    return userList.value.map(item => {
-        return {
-            value: item.id,
-            label: item.nickname + '-' + item.wallet_account
-        }
-    })
-})
-
 onMounted(async () => {
     await getChatGroupDetail();
-    await getUserList();
 })
 
 const getChatGroupDetail = async () => {
     group.value = await showChatGroups(groupId.value);
-}
-
-const getUserList = async (keyword = '') => {
-    const res = await users({
-        keyword,
-        page_size: 20
-    });
-    userList.value = res.data;
-}
-
-const handleUserSearch = async (value) => {
-    userLoading.value = true;
-    await getUserList(value);
-    userLoading.value = false;
 }
 
 const renderData = async ({ current }) => {
@@ -286,7 +258,7 @@ const handleAddUser = async (done) => {
         addUserFormRef.value.resetFields();
         listDataRef.value.refreshData();
     } catch (e) {
-        Message.error(e.message);
+
         done(false);
     }
 }

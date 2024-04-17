@@ -47,7 +47,7 @@
                     <template #content>
                         <a-doption>
                             <a-space @click="handleChangePassword">
-                                <icon-export/>
+                                <icon-lock/>
                                 <span>修改密码</span>
                             </a-space>
                         </a-doption>
@@ -61,7 +61,7 @@
                 </a-dropdown>
             </li>
         </ul>
-        <AModal :width="640" v-model:visible="passwordVisible" title="添加群组" @before-ok="handleChangePasswordConfirm">
+        <AModal :width="640" v-model:visible="passwordVisible" title="修改密码" @before-ok="handleChangePasswordConfirm">
             <AForm ref="passwordFormRef" :model="passwordForm" layout="vertical">
                 <AFormItem field="old_password" label="当前密码" :rules="[{required: true, message: '当前密码不能为空'}]">
                     <AInput type="password" v-model="passwordForm.old_password" placeholder="请输入当前密码" allow-clear/>
@@ -83,7 +83,7 @@ import {Message} from '@arco-design/web-vue';
 import {useDark, useToggle, useFullscreen} from '@vueuse/core';
 import {useAppStore, useUserStore} from '@admin/store';
 import useUser from '@admin/hooks/user';
-import {changeMePassword} from "@admin/api/user";
+import {changeMePassword} from "@admin/api/admin-user";
 import {useRouter} from "vue-router";
 
 const router = useRouter();

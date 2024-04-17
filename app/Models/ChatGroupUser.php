@@ -46,7 +46,7 @@ class ChatGroupUser extends Model
     protected function roleText(): Attribute
     {
         return Attribute::get(function () {
-            return self::$roleMap[$this->role];
+            return self::$roleMap[$this->role] ?? '';
         });
     }
 }

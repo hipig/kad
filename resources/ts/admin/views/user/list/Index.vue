@@ -52,6 +52,7 @@
             >
                 <template #actions>
                     <AButton @click="createVisible = true" type="primary">添加用户</AButton>
+                    <Export :export-data="exportData" file-name="用户列表" />
                 </template>
                 <template #action="{record}">
                     <AButton @click="handleUpdate(record)" type="text" size="small">编辑</AButton>
@@ -131,10 +132,11 @@
 </template>
 
 <script lang="tsx" setup>
-import {users, storeUsers, updateUsers, changeStatusUsers} from "@admin/api/user";
+import {users, storeUsers, updateUsers, changeStatusUsers, exportUsers} from "@admin/api/user";
 import {ref} from "vue";
 import {Message, Modal} from '@arco-design/web-vue';
 import {cloneDeep} from "lodash";
+import Export from "@admin/components/common/list-data/actions/export/Index.vue";
 
 const columns = [
     {
@@ -254,6 +256,12 @@ const renderData = async ({ current }) => {
     })
 }
 
+const exportData = async () => {
+    return await exportUsers({
+        ...filterForm.value
+    })
+}
+
 const handleFilter = () => {
     listDataRef.value.refreshData();
 }
@@ -278,7 +286,7 @@ const handleCreateUser = async (done) => {
         fileList.value = [];
         listDataRef.value.refreshData();
     } catch (e) {
-        Message.error(e.message);
+
         done(false);
     }
 }
@@ -336,7 +344,7 @@ const handleUpdateUser = async (done) => {
         updateFileList.value = [];
         listDataRef.value.refreshData();
     } catch (e) {
-        Message.error(e.message);
+
         done(false);
     }
 }

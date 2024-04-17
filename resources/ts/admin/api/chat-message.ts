@@ -17,3 +17,7 @@ export function withdrawChatMessages(data) {
     return axios.post<ChatMessageRecord>('chat-messages/withdraw', data);
 }
 
+export function exportChatMessages(params) {
+    return axios.get('chat-messages/export', {params, responseType: 'blob'});
+}
+
